@@ -4,4 +4,4 @@ from hello import get_greeting
 
 def test_get_greeting():
     """Teste si la fonction get_greeting retourne 'Hello World'"""
-    assert get_greeting() == "Hello World"
+    assert get_greeting() == "Hello World."
