@@ -40,7 +40,7 @@ jobs:
         run: pip install pytest
 
       - name: Run tests
-        run: pytest
+        run: pytest test_hello.py
 
   build-and-push:
     runs-on: ubuntu-latest
@@ -63,4 +63,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: docker.io/${{ secrets.DOCKER_USERNAME }}/hello-app:latest
+          tags: docker.io/${{ secrets.DOCKER_USERNAME }}/lab0:latest
