@@ -2,7 +2,7 @@
 
 def get_greeting():
     """Retourne une salutation simple."""
-    return "Hello World"
+    return "Hello World."
 
 def main():
     """Point d'entrée principal du programme."""
