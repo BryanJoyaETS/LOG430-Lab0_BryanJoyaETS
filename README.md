@@ -2,7 +2,7 @@
 
 # Hello App
 
-Cette application Python affiche le message `"Hello World"` et possède un .  
+Cette application Python affiche le message `"Hello World"`.
 Elle est conçue comme un projet de base pour démontrer :
 
 - l'utilisation de tests unitaires
@@ -29,18 +29,18 @@ pip3 install pylint pytest
 
 ### Structure du projet
 
-LOG430-LAB0BRYANJOYAETS/
-│
-├── .github/workflows/ci.yml      # Pipeline CI/CD (GitHub Actions)
-├──  images                       # Dossier d'images montrant le bon fonctionnement du projet
-├── .dockerignore                 # Fichiers ignorés par Docker
-├── .gitignore                    # Fichiers ignorés par Git
-├── docker-compose.yml            # Lancement du conteneur
-├── Dockerfile                    # Image Docker de l’application
-├── hello.py                      # Code principal
-├── requirements.txt              # Dépendances Python (pylint, pytest)
-├── test_hello.py                 # Test unitaire
-└── README.md                     
+- LOG430-LAB0BRYANJOYAETS/
+
+-  .github/workflows/ci.yml      # Pipeline CI/CD (GitHub Actions)
+-   images                       # Dossier d'images montrant le bon fonctionnement du projet
+-  .dockerignore                 # Fichiers ignorés par Docker
+-  .gitignore                    # Fichiers ignorés par Git
+-  docker-compose.yml            # Lancement du conteneur
+-  Dockerfile                    # Image Docker de l’application
+-  hello.py                      # Code principal
+-  requirements.txt              # Dépendances Python (pylint, pytest)
+-  test_hello.py                 # Test unitaire
+-  README.md                     
 
 ### Construire et lancer le conteneur :
 
@@ -55,4 +55,4 @@ fermer le conteneur : docker-compose down
 ![création du conteneur](images/image.png)
 
 
-![vérification des pipelines CI/CD](images/image-1.png)
+![pipeline CI/CD](/images/image2.png)
