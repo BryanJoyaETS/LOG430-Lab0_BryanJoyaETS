@@ -1,6 +1,6 @@
 # LOG430-Lab0_BryanJoyaETS
 
-# Hello App
+# Laboratoire 0 - Hello World App
 
 Cette application Python affiche le message `"Hello World"`.
 Elle est conçue comme un projet de base pour démontrer :
@@ -22,11 +22,12 @@ cloner le projet : git clone https://github.com/BryanJoyaETS/LOG430-Lab0_BryanJo
 - `pytest`
 
 #### Dans bash :
+```text
 
 sudo apt update
 sudo apt install python3 python3-pip -y
 pip3 install pylint pytest
-
+```
 ### Structure du projet
 
 ```text
@@ -67,5 +68,36 @@ fermer le conteneur : docker-compose down
 ![pipeline CI/CD](/images/image-1.png)
 
 
+
 ### Bon fonctionnement des test unitaires
 ![pytest](/images/image3.png)
+
+
+
+### Explication de CI/CD
+
+
+- Job lint :
+```text
+Utilise Python 3.11
+
+Installe pylint
+
+Analyse le fichier hello.py
+```
+- Job test :
+```text
+Utilise Python 3.11
+
+Installe pytest
+
+Exécute test_hello.py
+```
+- Job build-and-push :
+```text
+Configure Docker Build
+
+Se connecte à Docker Hub avec des secrets sécurisés de mon dépôt
+
+Construit et pousse l’image vers Docker Hub
+```
