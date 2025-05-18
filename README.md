@@ -54,10 +54,12 @@ fermer le conteneur : docker-compose down
 
 ### Captures d'écran
 
+### Création du conteneur
+
 ![création du conteneur](/images/image.png)
 
 
-
+### Bon fonctionnement du pipeline CI/CD
 ![pipeline CI/CD](/images/image2.png)
 
 
@@ -65,5 +67,5 @@ fermer le conteneur : docker-compose down
 ![pipeline CI/CD](/images/image-1.png)
 
 
-
+### Bon fonctionnement des test unitaires
 ![pytest](/images/image3.png)
