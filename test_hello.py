@@ -9,5 +9,3 @@ def test_get_greeting():
 def test_get_greeting_uppercase():
     """Teste si la fonction get_greeting_uppercase retourne 'HELLO WORLD'"""
     assert get_greeting_uppercase() == "HELLO WORLD."
-
-
