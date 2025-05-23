@@ -6,3 +6,25 @@ services:
     container_name: Lab0-container-BryanJoya
     ports:
       - "5000:5000"
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_DB=mydatabase
+      - POSTGRES_USER=myuser
+      - POSTGRES_PASSWORD=mypassword
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    container_name: my-postgres
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

@@ -1,15 +1,14 @@
 FROM python:3.11-slim
 
-# Set the working directory to /app
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
-COPY . /app
+# Copier requirements si tu as un fichier requirements.txt
+COPY requirements.txt ./
 
+# Installer les dépendances Python
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Make port 80 available to the world outside this container
-EXPOSE 80
+# Copier le code de l’application
+COPY . .
 
-
-# Run app.py when the container launches
-CMD ["python", "hello.py"]
+CMD ["python", "application/main.py"]
