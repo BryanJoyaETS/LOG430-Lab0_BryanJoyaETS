@@ -10,6 +10,7 @@ Ce module fournit la classe Caisse permettant :
 
 from datetime import datetime
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 from .tables import Produit, Vente, LigneVente
 
 
@@ -24,7 +25,12 @@ class Caisse:
         """
         self.session = session
 
-    def rechercher_produit(self, identifiant: int | None = None, nom: str | None = None, categorie: str | None = None):
+    def rechercher_produit(
+        self,
+        identifiant: int|None = None,
+        nom: str|None = None,
+        categorie: str|None = None
+        ):
         """
         Recherche un ou plusieurs produits selon l'identifiant, le nom ou la catégorie.
 
@@ -43,8 +49,14 @@ class Caisse:
 
             produits = query.all()
             for produit in produits:
-                print(f"ID: {produit.id} | Nom: {produit.nom} | Catégorie: {produit.categorie} | Stock: {produit.stock} | Prix: {produit.prix}")
-        except Exception as e:
+                print(
+                    f"ID: {produit.id} | "
+                    f"Nom: {produit.nom} | "
+                    f"Catégorie: {produit.categorie} | "
+                    f"Stock: {produit.stock} | "
+                    f"Prix: {produit.prix}"
+                )
+        except SQLAlchemyError as e:
             print(f"Erreur lors de la recherche du produit : {e}")
 
     def enregistrer_vente(self, produits: list[tuple[int, int]]):
@@ -64,7 +76,12 @@ class Caisse:
 
             total = 0
             for produit_id, quantite in produits:
-                produit = self.session.query(Produit).filter(Produit.id == produit_id).with_for_update().one_or_none()
+                produit = (
+                    self.session.query(Produit)
+                    .filter(Produit.id == produit_id)
+                    .with_for_update()
+                    .one_or_none()
+                )
                 if not produit:
                     raise ValueError(f"Produit {produit_id} non trouvé")
                 if produit.stock < quantite:
@@ -84,7 +101,7 @@ class Caisse:
             self.session.commit()
             print(f"Vente enregistrée (id_vente={vente.id}) — Total : {total:.2f} €")
 
-        except Exception as e:
+        except SQLAlchemyError as e:
             self.session.rollback()
             print(f"La vente a échoué : {e}")
 
@@ -118,7 +135,7 @@ class Caisse:
             self.session.commit()
             print("Retour traité avec succès")
 
-        except Exception as e:
+        except SQLAlchemyError as e:
             self.session.rollback()
             print(f"Erreur lors du traitement du retour : {e}")
 
@@ -129,8 +146,11 @@ class Caisse:
         try:
             produits = self.session.query(Produit).order_by(Produit.id).all()
             for p in produits:
-                print(f"ID: {p.id} | Nom: {p.nom} | Catégorie: {p.categorie} | Stock: {p.stock} | Prix: {p.prix}")
-        except Exception as e:
+                print(
+                    f"ID: {p.id} | Nom: {p.nom} | Catégorie: {p.categorie} | "
+                    f"Stock: {p.stock} | Prix: {p.prix}"
+                )
+        except SQLAlchemyError as e:
             print(f"Erreur lors de la consultation du stock : {e}")
 
     def consulter_historique_transactions(self):
@@ -156,11 +176,14 @@ class Caisse:
                     if produit:
                         montant = ligne.quantite * ligne.prix_unitaire
                         total += montant
-                        print(f"Produit: {produit.nom} | Quantité: {ligne.quantite} | Prix unitaire: {ligne.prix_unitaire} | Montant: {montant:.2f} €")
-
+                        print(
+                            f"Produit: {produit.nom} | Quantité: {ligne.quantite} | "
+                            f"Prix unitaire: {ligne.prix_unitaire}\n"
+                            f"Montant: {montant:.2f} €"
+                        )
                 print("-" * 50)
                 print(f"Total de la vente: {total:.2f} €")
                 print("\n")
 
-        except Exception as e:
+        except SQLAlchemyError as e:
             print(f"Erreur lors de la consultation de l'historique des transactions : {e}")
