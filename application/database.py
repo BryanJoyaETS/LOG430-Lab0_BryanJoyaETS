@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from tables import Base, Produit
+from .tables import Base, Produit
 
 DB_URL = "postgresql+psycopg2://myuser:mypassword@db:5432/mydatabase"
 

@@ -1,6 +1,6 @@
-from database import setup_database, clear_and_populate_produit, SessionLocal
-from caisse import Caisse
-from interface import interface_caisse
+from .database import setup_database, clear_and_populate_produit, SessionLocal
+from .caisse import Caisse
+from .interface import interface_caisse
 
 def gestion_caisse(id_caisse):
     session = SessionLocal()
