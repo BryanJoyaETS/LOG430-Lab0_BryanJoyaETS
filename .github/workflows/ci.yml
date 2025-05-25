@@ -40,7 +40,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run tests
-        run: pytest test_caisse.py
+        run: pytest test_caisse.py test_interface.py
 
   build-and-push:
     runs-on: ubuntu-latest
