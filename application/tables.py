@@ -8,6 +8,7 @@ from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
+# pylint: disable=too-few-public-methods
 class Produit(Base):
     """
     Représente un produit en vente dans le magasin.
@@ -27,6 +28,7 @@ class Produit(Base):
     stock = Column(Integer, nullable=False)
     prix = Column(Numeric(10, 2), nullable=False)
 
+# pylint: disable=too-few-public-methods
 class Vente(Base):
     """
     Représente une vente effectuée.
@@ -42,6 +44,7 @@ class Vente(Base):
     date = Column(DateTime, default=datetime.now)
     lignes = relationship("LigneVente", back_populates="vente")
 
+# pylint: disable=too-few-public-methods
 class LigneVente(Base):
     """
     Représente une ligne dans une vente (un produit et sa quantité).

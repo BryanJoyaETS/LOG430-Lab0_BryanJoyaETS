@@ -67,7 +67,6 @@ def interface_caisse(caisse):
             if choix == "6":
                 action()
                 break
-            else:
-                action()
+            action()
         else:
             print("Choix invalide.")
