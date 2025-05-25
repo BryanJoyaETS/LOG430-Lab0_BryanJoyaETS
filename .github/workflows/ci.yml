@@ -22,7 +22,7 @@ jobs:
         run: pip install pylint
 
       - name: Run pylint
-        run: pylint hello.py
+        run: pylint application/caisse.py application/database.py application/interface.py application/main.py application/tables.py 
 
   test:
     runs-on: ubuntu-latest
