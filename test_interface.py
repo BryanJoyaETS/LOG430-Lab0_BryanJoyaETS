@@ -1,7 +1,7 @@
 import pytest
 from application.interface import interface_caisse
 from application.caisse import Caisse
-from application.tables import Base, Produit
+from application.tables import Base, Produit, Vente
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -65,17 +65,21 @@ def test_enregistrer_vente(monkeypatch, capsys, caisse, session):
     prod = session.query(Produit).get(p.id)
     assert prod.stock == 2  # 5 - 3 = 2
 
+from application.tables import Vente  # ajoute ça en haut si ce n'est pas déjà fait
+
 def test_gerer_retour(monkeypatch, capsys, caisse, session):
     # Ajouter produit et enregistrer une vente
     p = Produit(nom="ProdRetour", categorie="CatRetour", stock=10, prix=1.5)
     session.add(p)
     session.commit()
     caisse.enregistrer_vente([(p.id, 2)])
-    vente = session.query(caisse.session.get_bind().execute("SELECT id FROM vente").cursor).first()
-    
+
+    # Récupérer l'ID de la dernière vente
+    vente = session.query(Vente).order_by(Vente.id.desc()).first()
+
     inputs = iter([
         "3",            # choix : gérer retour
-        str(vente[0]),  # id vente (récupéré)
+        str(vente.id),  # id vente
         "6"             # quitter
     ])
     monkeypatch.setattr("builtins.input", lambda _: next(inputs))
@@ -83,8 +87,9 @@ def test_gerer_retour(monkeypatch, capsys, caisse, session):
     interface_caisse(caisse)
     captured = capsys.readouterr()
     assert "Retour traité avec succès" in captured.out
-    prod = session.query(Produit).get(p.id)
+    prod = session.get(Produit, p.id)
     assert prod.stock == 10  # stock rétabli après retour
+
 
 def test_consulter_stock(monkeypatch, capsys, caisse, session):
     p = Produit(nom="ProdStock", categorie="CatStock", stock=7, prix=3.5)
