@@ -30,7 +30,7 @@ def menu_principal():
         elif choix == "3":
             gestion_caisse(3)
         elif choix == "4":
-            print("Fermeture du système.")
+            print("Fermeture du système")
             break
         else:
             print("Choix invalide")
