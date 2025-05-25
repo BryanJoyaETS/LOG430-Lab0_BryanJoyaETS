@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from datetime import datetime
-from tables import Produit, Vente, LigneVente
+from application.tables import Produit, Vente, LigneVente
 
 class Caisse:
     def __init__(self, session: Session):
