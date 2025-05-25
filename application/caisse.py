@@ -1,102 +1,127 @@
-import psycopg2
-from database import create_connection
+from sqlalchemy.orm import Session
+from datetime import datetime
+from tables import Produit, Vente, LigneVente
 
 class Caisse:
-    def __init__(self, conn):
-        self.conn = conn
+    def __init__(self, session: Session):
+        self.session = session
 
-    def rechercher_produit(self, identifiant=None, nom=None, categorie=None):
+    def rechercher_produit(self, identifiant: int | None = None, nom: str | None = None, categorie: str | None = None):
         try:
-            with self.conn.cursor() as cur:
-                requete = "SELECT * FROM produit WHERE "
-                conditions = []
-                params = []
+            query = self.session.query(Produit)
+            if identifiant:
+                query = query.filter(Produit.id == identifiant)
+            if nom:
+                query = query.filter(Produit.nom == nom)
+            if categorie:
+                query = query.filter(Produit.categorie == categorie)
 
-                if identifiant:
-                    conditions.append("id = %s")
-                    params.append(identifiant)
-                if nom:
-                    conditions.append("nom = %s")
-                    params.append(nom)
-                if categorie:
-                    conditions.append("categorie = %s")
-                    params.append(categorie)
-
-                if not conditions:
-                    requete = "SELECT * FROM produit"
-                else:
-                    requete += " AND ".join(conditions)
-
-                cur.execute(requete, params)
-                produits = cur.fetchall()
-                for produit in produits:
-                    print(produit)
-        except psycopg2.Error as e:
+            produits = query.all()
+            for produit in produits:
+                print(f"ID: {produit.id} | Nom: {produit.nom} | Catégorie: {produit.categorie} | Stock: {produit.stock} | Prix: {produit.prix}")
+        except Exception as e:
             print(f"Erreur lors de la recherche du produit : {e}")
 
-    def enregistrer_vente(self, produits):
+    def enregistrer_vente(self, produits: list[tuple[int, int]]):
         try:
-            with self.conn:
-                with self.conn.cursor() as cur:
-                    cur.execute("BEGIN")
-                    cur.execute("INSERT INTO vente (date) VALUES (CURRENT_TIMESTAMP) RETURNING id")
-                    id_vente = cur.fetchone()[0]
+            if self.session.in_transaction():
+                self.session.commit()
 
-                    total = 0
-                    for produit_id, quantite in produits:
-                        cur.execute("SELECT stock, prix FROM produit WHERE id = %s FOR UPDATE", (produit_id,))
-                        resultat = cur.fetchone()
-                        if not resultat:
-                            raise Exception("Produit non trouvé")
-                        stock, prix = resultat
-                        if stock < quantite:
-                            raise Exception("Stock insuffisant")
+            self.session.begin()
+            vente = Vente(date=datetime.now())
+            self.session.add(vente)
+            self.session.flush()
 
-                        cur.execute("""
-                            INSERT INTO ligne_vente (vente_id, produit_id, quantite, prix_unitaire)
-                            VALUES (%s, %s, %s, %s)
-                        """, (id_vente, produit_id, quantite, prix))
+            total = 0
+            for produit_id, quantite in produits:
+                produit = self.session.query(Produit).filter(Produit.id == produit_id).with_for_update().one_or_none()
+                if not produit:
+                    raise Exception(f"Produit {produit_id} non trouvé")
+                if produit.stock < quantite:
+                    raise Exception(f"Stock insuffisant pour le produit {produit.nom}")
 
-                        cur.execute("""
-                            UPDATE produit
-                            SET stock = stock - %s
-                            WHERE id = %s
-                        """, (quantite, produit_id))
+                ligne = LigneVente(
+                    vente_id=vente.id,
+                    produit_id=produit.id,
+                    quantite=quantite,
+                    prix_unitaire=produit.prix
+                )
+                self.session.add(ligne)
 
-                        total += prix * quantite
+                produit.stock -= quantite
+                total += quantite * float(produit.prix)
 
-                    print(f"Vente enregistrée (id_vente={id_vente}) — Total : {total} €")
+            self.session.commit()
+            print(f"Vente enregistrée (id_vente={vente.id}) — Total : {total:.2f} €")
+
         except Exception as e:
-            self.conn.rollback()
+            self.session.rollback()
             print(f"La vente a échoué : {e}")
-
-    def gerer_retour(self, id_vente):
+        
+    def gerer_retour(self, id_vente: int):
         try:
-            with self.conn:
-                with self.conn.cursor() as cur:
-                    cur.execute("SELECT produit_id, quantite FROM ligne_vente WHERE vente_id = %s", (id_vente,))
-                    lignes_vente = cur.fetchall()
+            if self.session.in_transaction():
+                self.session.commit()
 
-                    for produit_id, quantite in lignes_vente:
-                        cur.execute("""
-                            UPDATE produit
-                            SET stock = stock + %s
-                            WHERE id = %s
-                        """, (quantite, produit_id))
+            self.session.begin()
+            lignes = self.session.query(LigneVente).filter_by(vente_id=id_vente).all()
+            if not lignes:
+                print("Aucune ligne de vente trouvée pour ce retour.")
+                self.session.commit()
+                return
 
-                    cur.execute("DELETE FROM ligne_vente WHERE vente_id = %s", (id_vente,))
-                    cur.execute("DELETE FROM vente WHERE id = %s", (id_vente,))
+            for ligne in lignes:
+                produit = self.session.query(Produit).filter_by(id=ligne.produit_id).first()
+                if produit:
+                    produit.stock += ligne.quantite
+                self.session.delete(ligne)
 
-                    print("Retour traité avec succès")
-        except psycopg2.Error as e:
+            vente = self.session.query(Vente).filter_by(id=id_vente).first()
+            if vente:
+                self.session.delete(vente)
+
+            self.session.commit()
+            print("Retour traité avec succès")
+
+        except Exception as e:
+            self.session.rollback()
             print(f"Erreur lors du traitement du retour : {e}")
 
     def consulter_stock(self):
         try:
-            with self.conn.cursor() as cur:
-                cur.execute("SELECT * FROM produit")
-                produits = cur.fetchall()
-                for produit in produits:
-                    print(produit)
-        except psycopg2.Error as e:
+            produits = self.session.query(Produit).order_by(Produit.id).all()
+            for p in produits:
+                print(f"ID: {p.id} | Nom: {p.nom} | Catégorie: {p.categorie} | Stock: {p.stock} | Prix: {p.prix}")
+        except Exception as e:
             print(f"Erreur lors de la consultation du stock : {e}")
+
+    def consulter_historique_transactions(self):
+        try:
+            ventes = self.session.query(Vente).order_by(Vente.date.desc()).all()
+
+            if not ventes:
+                print("Aucune transaction trouvée.")
+                return
+
+            for vente in ventes:
+                print(f"ID Vente: {vente.id} | Date: {vente.date}")
+                print("-" * 50)
+
+                lignes = self.session.query(LigneVente).filter_by(vente_id=vente.id).all()
+
+                total = 0
+                for ligne in lignes:
+                    produit = self.session.query(Produit).filter_by(id=ligne.produit_id).first()
+                    if produit:
+                        montant = ligne.quantite * ligne.prix_unitaire
+                        total += montant
+                        print(f"Produit: {produit.nom} | Quantité: {ligne.quantite} | Prix unitaire: {ligne.prix_unitaire} | Montant: {montant:.2f} €")
+
+                print("-" * 50)
+                print(f"Total de la vente: {total:.2f} €")
+                print("\n")
+
+        except Exception as e:
+            print(f"Erreur lors de la consultation de l'historique des transactions : {e}")
+         
+

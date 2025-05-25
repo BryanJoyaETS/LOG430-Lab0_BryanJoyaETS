@@ -1,23 +1,19 @@
-import threading
-from database import setup_database, create_connection, connection_pool, clear_and_populate_produit
+from database import setup_database, clear_and_populate_produit, SessionLocal
 from caisse import Caisse
 from interface import interface_caisse
 
 def gestion_caisse(id_caisse):
-    conn = create_connection()
-    if not conn:
-        print(f"[Caisse {id_caisse}] Échec de la connexion")
-        return
-
-    print(f"[Caisse {id_caisse}] Prête")
-    pos = Caisse(conn)
-    interface_caisse(pos)
-    connection_pool.putconn(conn)
-    print(f"[Caisse {id_caisse}] Fermée")
+    session = SessionLocal()
+    try:
+        print(f"[Caisse {id_caisse}] Prête")
+        pos = Caisse(session)
+        interface_caisse(pos)
+    finally:
+        session.close()
+        print(f"[Caisse {id_caisse}] Fermée")
 
 def menu_principal():
     setup_database()
-    clear_and_populate_produit()
 
     while True:
         print("\nMenu Principal :")
