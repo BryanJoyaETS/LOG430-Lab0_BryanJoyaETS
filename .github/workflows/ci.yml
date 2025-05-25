@@ -19,7 +19,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install pylint
+        run: pip install -r requirements.txt
 
       - name: Run pylint
         run: pylint application/caisse.py application/database.py application/interface.py application/main.py application/tables.py 
