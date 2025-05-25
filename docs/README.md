@@ -17,7 +17,7 @@ est une application console locale qui interagit directement avec une base de do
 - toutes les installations requises devraient se télécharger lors du chargement du fichier requirements.txt dans le fichier Dockerfile
 (pylint, pytest, sqlalchemy, psycopg2-binary==2.9.6)
 
-2. Rouler le service client (nommé web) interactivement : **docker compose run web**
+2. Rouler le service client (nommé web) interactivement : **docker compose run web**, dans le cas où on ne se connecte pas d'un coup, rouler **docker compose run web** à nouveau établit la connexion correctement.
 
 3. Vous devriez pouvoir intéragir avec la console et l'application de caisse !
 
