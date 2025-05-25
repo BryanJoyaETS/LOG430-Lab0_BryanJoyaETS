@@ -3,7 +3,7 @@ version: "3.11"
 services:
   web:
     build: .
-    container_name: Lab0-container-BryanJoya
+    container_name: lab0-container-bryanjoya
     ports:
       - "5000:5000"
     environment:
