@@ -4,8 +4,8 @@ from datetime import datetime
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from tables import Base, Produit, Vente
-from caisse import Caisse
+from application.tables import Base, Produit, Vente
+from application.caisse import Caisse
 
 # Crée une base en mémoire pour les tests
 @pytest.fixture(scope="function")
