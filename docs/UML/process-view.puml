@@ -1,0 +1,43 @@
+@startuml
+title Process View - Gestion de Caisse (détails transactionnels)
+
+actor Utilisateur
+
+participant "Interface Console" as Interface
+participant "Caisse (logique métier)" as Caisse
+participant "Session DB (SQLAlchemy)" as SessionDB
+database "PostgreSQL DB" as DB
+
+== Ouverture session caisse ==
+Utilisateur -> Interface : Démarrer session caisse
+Interface -> Caisse : Instanciation avec session active
+Caisse -> SessionDB : Ouvre session base
+
+== Recherche produit ==
+Utilisateur -> Interface : Demande recherche produit (id/nom/catégorie)
+Interface -> Caisse : rechercher_produit(...)
+Caisse -> SessionDB : SELECT produits (sans transaction)
+SessionDB -> DB : Lecture données
+DB --> SessionDB : Résultats
+SessionDB --> Caisse : Données produits
+Caisse --> Interface : Affichage résultats
+
+== Enregistrement vente ==
+Utilisateur -> Interface : Saisie produits + quantités
+Interface -> Caisse : enregistrer_vente(produits)
+Caisse -> SessionDB : Début transaction (begin)
+Caisse -> SessionDB : SELECT produit FOR UPDATE (verrouillage)
+SessionDB -> DB : Lecture produits avec verrou
+DB --> SessionDB : Données verrouillées
+Caisse -> SessionDB : INSERT vente
+Caisse -> SessionDB : INSERT lignes vente
+Caisse -> SessionDB : UPDATE stock produits
+SessionDB -> DB : Écriture vente et stock
+DB --> SessionDB : Confirmation
+SessionDB --> Caisse : Commit transaction
+Caisse --> Interface : Confirmation vente + total
+
+== Gestion retour vente ==
+Utilisateur -> Interface : Demande retour vente (id)
+Interface -> Caisse : gerer_retour(id_vente)
+Caisse -> SessionD

@@ -31,13 +31,13 @@ est une application console locale qui interagit directement avec une base de do
 
 
 # Choix technologiques
-| Technologie                   | Rôle dans le projet             | Justification                                                                                     |
-| ----------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------- |
-| **Python 3.10+**              | Langage principal               | Les dépendences nécessaires pour programmer en Pythonse trouvaient dans l'environnement de la VM  |
-| **SQLAlchemy**                | ORM                             | Fournit une abstraction pour manipuler des bases SQL en objets Python.                            |
-| **PostgreSQL**                | Base de données principale      | SGBD open source  pour les applications multi-utilisateurs.                                       |
-| **SQLite**                    | Base légère pour les tests      | Ne nécessite pas d’installation, utilisée pour les tests unitaires locaux.                        |
-| **Docker**                    | Conteneurisation de PostgreSQL  | Pour la conteneurisation du logiciel                                                              |
-| ~~**psycopg2**~~ *(retiré)*   | *(Pilote PostgreSQL)*           | Était requis pour SQLAlchemy avec PostgreSQL, mais n’est plus utilisé directement grâce à l’ORM.  |
+| Technologie                   | Rôle dans le projet               | Justification                                                                                     |
+| ----------------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------- |
+| **Python 3.10+**              | Langage principal                 | Les dépendences nécessaires pour programmer en Pythonse trouvaient dans l'environnement de la VM  |
+| **SQLAlchemy**                | ORM                               | Fournit une abstraction pour manipuler des bases SQL en objets Python.                            |
+| **PostgreSQL**                | Base de données principale        | SGBD open source  pour les applications multi-utilisateurs.                                       |
+| **SQLite**                    | Base légère pour les tests        | Ne nécessite pas d’installation, utilisée pour les tests unitaires locaux.                        |
+| **Docker**                    | Conteneurisation de PostgreSQL    | Pour la conteneurisation du logiciel                                                              |
+| **psycopg2**                  | Pilote PostgreSQL pour SQLAlchemy | Driver stable et utilisé pour la connexion à PostgreSQL via SQLAlchemy.                           |
 
 

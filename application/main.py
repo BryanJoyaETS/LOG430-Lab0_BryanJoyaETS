@@ -1,6 +1,6 @@
 """Point d'entrée de l'application de gestion de caisse."""
 
-from .database import setup_database, SessionLocal
+from .database import populate_if_produit_empty, setup_database, SessionLocal
 from .caisse import Caisse
 from .interface import interface_caisse
 
@@ -24,7 +24,7 @@ def menu_principal():
     Initialise la base de données avant d'afficher le menu.
     """
     setup_database()
-
+    populate_if_produit_empty()
     while True:
         print("\nMenu Principal :")
         print("1. Caisse 1")

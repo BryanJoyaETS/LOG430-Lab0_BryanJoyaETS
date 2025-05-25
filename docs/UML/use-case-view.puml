@@ -1,0 +1,14 @@
+@startuml
+actor "Employé du Magasin"
+usecase "Rechercher Produit"
+usecase "Enregistrer Vente"
+usecase "Gérer Retour"
+usecase "Consulter Stock"
+usecase "Voir Historique des Transactions"
+
+"Employé du Magasin" --> "Rechercher Produit"
+"Employé du Magasin" --> "Enregistrer Vente"
+"Employé du Magasin" --> "Gérer Retour"
+"Employé du Magasin" --> "Consulter Stock"
+"Employé du Magasin" --> "Voir Historique des Transactions"
+@enduml

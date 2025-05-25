@@ -1,0 +1,33 @@
+@startuml
+package "application" {
+  class "database.py" {
+    + setup_database()
+    + populate_if_produit_empty()
+  }
+  class "tables.py" {
+    + Produit
+    + Vente
+    + LigneVente
+  }
+  class "caisse.py" {
+    + rechercher_produit()
+    + enregistrer_vente()
+    + gerer_retour()
+    + consulter_stock()
+    + consulter_historique_transactions()
+  }
+  class "interface.py" {
+    + interface_caisse()
+  }
+}
+
+package "tests" {
+  class "test_database.py"
+  class "test_caisse.py"
+}
+
+application --> tests : Importation des modules
+database.py --> tables.py
+caisse.py --> database.py
+interface.py --> caisse.py
+@enduml

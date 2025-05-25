@@ -1,0 +1,25 @@
+@startuml
+
+node "Machine Hôte" {
+  
+  node "Docker Engine" {
+  
+    node "Container : Web App (lab0-container-bryanjoya)" {
+      artifact "Python App"
+      component "application.main"
+      component "caisse.py"
+      component "interface.py"
+      component "database.py"
+      component "tables.py"
+    }
+
+    node "Container : PostgreSQL (my-postgres)" {
+      database "PostgreSQL 15"
+    }
+
+  }
+}
+
+"Python App" --> "PostgreSQL 15" : Connexion via SQLAlchemy\n(DB_URL=postgresql+psycopg2)
+
+@enduml

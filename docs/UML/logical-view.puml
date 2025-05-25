@@ -1,0 +1,26 @@
+@startuml
+class Produit {
+  - id: int
+  - nom: string
+  - categorie: string
+  - stock: int
+  - prix: decimal
+}
+
+class Vente {
+  - id: int
+  - date: datetime
+  - lignes: list<LigneVente>
+}
+
+class LigneVente {
+  - id: int
+  - vente_id: int
+  - produit_id: int
+  - quantite: int
+  - prix_unitaire: decimal
+}
+
+Produit "1" *-- "0..*" LigneVente
+Vente "1" *-- "0..*" LigneVente
+@enduml
