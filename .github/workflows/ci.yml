@@ -40,7 +40,7 @@ jobs:
         run: pip install pytest
 
       - name: Run tests
-        run: pytest test_hello.py
+        run: pytest test_caisse.py
 
   build-and-push:
     runs-on: ubuntu-latest
