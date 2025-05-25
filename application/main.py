@@ -1,8 +1,14 @@
-from .database import setup_database, clear_and_populate_produit, SessionLocal
+"""Point d'entrée de l'application de gestion de caisse."""
+
+from .database import setup_database, SessionLocal
 from .caisse import Caisse
 from .interface import interface_caisse
 
 def gestion_caisse(id_caisse):
+    """
+    Gère une session de caisse spécifique identifiée par son ID.
+    Initialise une session de base de données et démarre l'interface.
+    """
     session = SessionLocal()
     try:
         print(f"[Caisse {id_caisse}] Prête")
@@ -13,6 +19,10 @@ def gestion_caisse(id_caisse):
         print(f"[Caisse {id_caisse}] Fermée")
 
 def menu_principal():
+    """
+    Affiche le menu principal permettant de choisir une caisse à ouvrir.
+    Initialise la base de données avant d'afficher le menu.
+    """
     setup_database()
 
     while True:

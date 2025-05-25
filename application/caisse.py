@@ -1,12 +1,37 @@
-from sqlalchemy.orm import Session
+"""Module de gestion des opérations de caisse pour un magasin.
+
+Ce module fournit la classe Caisse permettant :
+- la recherche de produits,
+- l'enregistrement des ventes,
+- la gestion des retours,
+- la consultation du stock,
+- l'affichage de l'historique des transactions.
+"""
+
 from datetime import datetime
+from sqlalchemy.orm import Session
 from .tables import Produit, Vente, LigneVente
 
+
 class Caisse:
+    """Classe représentant une caisse de magasin."""
+
     def __init__(self, session: Session):
+        """
+        Initialise une instance de Caisse.
+
+        :param session: Session SQLAlchemy active pour les opérations sur la base de données.
+        """
         self.session = session
 
     def rechercher_produit(self, identifiant: int | None = None, nom: str | None = None, categorie: str | None = None):
+        """
+        Recherche un ou plusieurs produits selon l'identifiant, le nom ou la catégorie.
+
+        :param identifiant: ID du produit (optionnel)
+        :param nom: Nom du produit (optionnel)
+        :param categorie: Catégorie du produit (optionnel)
+        """
         try:
             query = self.session.query(Produit)
             if identifiant:
@@ -23,6 +48,11 @@ class Caisse:
             print(f"Erreur lors de la recherche du produit : {e}")
 
     def enregistrer_vente(self, produits: list[tuple[int, int]]):
+        """
+        Enregistre une vente et met à jour le stock des produits.
+
+        :param produits: Liste de tuples (id_produit, quantité)
+        """
         try:
             if self.session.in_transaction():
                 self.session.commit()
@@ -36,9 +66,9 @@ class Caisse:
             for produit_id, quantite in produits:
                 produit = self.session.query(Produit).filter(Produit.id == produit_id).with_for_update().one_or_none()
                 if not produit:
-                    raise Exception(f"Produit {produit_id} non trouvé")
+                    raise ValueError(f"Produit {produit_id} non trouvé")
                 if produit.stock < quantite:
-                    raise Exception(f"Stock insuffisant pour le produit {produit.nom}")
+                    raise ValueError(f"Stock insuffisant pour le produit {produit.nom}")
 
                 ligne = LigneVente(
                     vente_id=vente.id,
@@ -57,8 +87,13 @@ class Caisse:
         except Exception as e:
             self.session.rollback()
             print(f"La vente a échoué : {e}")
-        
+
     def gerer_retour(self, id_vente: int):
+        """
+        Gère le retour d'une vente : réapprovisionne les stocks et supprime la vente.
+
+        :param id_vente: Identifiant de la vente à annuler.
+        """
         try:
             if self.session.in_transaction():
                 self.session.commit()
@@ -88,6 +123,9 @@ class Caisse:
             print(f"Erreur lors du traitement du retour : {e}")
 
     def consulter_stock(self):
+        """
+        Affiche la liste de tous les produits avec leurs informations de stock.
+        """
         try:
             produits = self.session.query(Produit).order_by(Produit.id).all()
             for p in produits:
@@ -96,6 +134,9 @@ class Caisse:
             print(f"Erreur lors de la consultation du stock : {e}")
 
     def consulter_historique_transactions(self):
+        """
+        Affiche l'historique de toutes les ventes enregistrées.
+        """
         try:
             ventes = self.session.query(Vente).order_by(Vente.date.desc()).all()
 
@@ -123,5 +164,3 @@ class Caisse:
 
         except Exception as e:
             print(f"Erreur lors de la consultation de l'historique des transactions : {e}")
-         
-
