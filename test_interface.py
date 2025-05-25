@@ -1,5 +1,5 @@
 import pytest
-from application.interface_caisse import interface_caisse
+from application.interface import interface_caisse
 from application.caisse import Caisse
 from application.tables import Base, Produit
 from sqlalchemy import create_engine
