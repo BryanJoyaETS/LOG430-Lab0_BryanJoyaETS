@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Django App</title>
+</head>
+<body>
+    <h1>Hello, welcome to my Django app!</h1>
+    <p>This is a simple page rendered using Django templates.</p>
+
+    <h2>Products List</h2>
+    <ul>
+        {% for produit in produits %}
+            <li>
+                <strong>{{ produit.nom }}</strong> <br>
+                Category: {{ produit.categorie }}<br>
+                Stock: {{ produit.stock }}<br>
+                Price: ${{ produit.prix }}
+            </li>
+        {% empty %}
+            <li>No products available.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

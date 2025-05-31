@@ -2,3 +2,4 @@ pylint
 pytest
 sqlalchemy
 psycopg2-binary==2.9.6
+Django==4.2
