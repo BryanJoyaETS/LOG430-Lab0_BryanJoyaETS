@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Historique des Transactions</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 80%;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+        }
+        th {
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+    <h1>Historique des Transactions</h1>
+    {% if ventes %}
+        {% for vente in ventes %}
+            <h2>Vente n°{{ vente.id }} - {{ vente.date|date:"d/m/Y H:i" }}</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Produit</th>
+                        <th>Quantité</th>
+                        <th>Prix Unitaire</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ligne in vente.lignes.all %}
+                        <tr>
+                            <td>{{ ligne.produit.nom }}</td>
+                            <td>{{ ligne.quantite }}</td>
+                            <td>{{ ligne.prix_unitaire }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endfor %}
+    {% else %}
+        <p>Aucune transaction enregistrée.</p>
+    {% endif %}
+    <p><a href="{% url 'index' %}">Retour au menu principal</a></p>
+</body>
+</html>

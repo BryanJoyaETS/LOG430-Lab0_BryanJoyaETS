@@ -18,9 +18,15 @@ from django.contrib import admin
 from django.urls import path
 from django.contrib import admin
 from django.urls import path
-from myapp.views import index
+from myapp.views import index, recherche_produit, enregistrer_vente, traiter_retour, consulter_stock, historique_transactions
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index, name='index'),
+    path('recherche/', recherche_produit, name='recherche_produit'),
+    path('vente/', enregistrer_vente, name='enregistrer_vente'),
+    path('retour/', traiter_retour, name='traiter_retour'),
+    path('stock/', consulter_stock, name='consulter_stock'),
+    path('historique/', historique_transactions, name='historique_transactions'),
+
 ]

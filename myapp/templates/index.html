@@ -1,24 +1,58 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>My Django App</title>
+    <title>Interface de la Caisse</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            max-width: 600px;
+        }
+        li {
+            background-color: #fff;
+            margin: 10px 0;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        li:hover {
+            transform: scale(1.02);
+        }
+        a {
+            display: block;
+            padding: 15px 20px;
+            color: #0077cc;
+            text-decoration: none;
+            font-size: 18px;
+        }
+        a:hover {
+            background-color: #e6f2ff;
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello, welcome to my Django app!</h1>
-    <p>This is a simple page rendered using Django templates.</p>
-
-    <h2>Products List</h2>
+    <h1>Menu de la caisse</h1>
     <ul>
-        {% for produit in produits %}
-            <li>
-                <strong>{{ produit.nom }}</strong> <br>
-                Category: {{ produit.categorie }}<br>
-                Stock: {{ produit.stock }}<br>
-                Price: ${{ produit.prix }}
-            </li>
-        {% empty %}
-            <li>No products available.</li>
-        {% endfor %}
+        <li><a href="{% url 'recherche_produit' %}">1. Rechercher un produit</a></li>
+        <li><a href="{% url 'enregistrer_vente' %}">2. Enregistrer une vente</a></li>
+        <li><a href="{% url 'traiter_retour' %}">3. Traiter un retour</a></li>
+        <li><a href="{% url 'consulter_stock' %}">4. Consulter le stock</a></li>
+        <li><a href="{% url 'historique_transactions' %}">5. Consulter l'historique des transactions</a></li>
     </ul>
 </body>
 </html>
