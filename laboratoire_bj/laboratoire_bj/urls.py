@@ -18,17 +18,49 @@ from django.contrib import admin
 from django.urls import path
 from django.contrib import admin
 from django.urls import path
-from myapp.views import generer_rapport, recherche_produit, enregistrer_vente, tableau_bord, traiter_retour, consulter_stock, historique_transactions, afficher_magasins, stock_magasin
+from myapp.views import demande_reappro, generer_rapport, interface_caisse, recherche_produit, enregistrer_vente, tableau_bord, traiter_retour, historique_transactions, afficher_magasins, stock_magasin
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', afficher_magasins, name='index'),
-    path('recherche/', recherche_produit, name='recherche_produit'),
-    path('vente/', enregistrer_vente, name='enregistrer_vente'),
-    path('retour/', traiter_retour, name='traiter_retour'),
-    path('stock/', consulter_stock, name='consulter_stock'),
-    path('historique/', historique_transactions, name='historique_transactions'),
-    path('stock/<int:magasin_id>/', stock_magasin, name='stock_magasin'),
     path('rapport/', generer_rapport, name='generer_rapport'),
-    path('dashboard/', tableau_bord, name='tableau_bord')
+    path('dashboard/', tableau_bord, name='tableau_bord'),
+    path('demande-reappro/<int:stock_id>/', demande_reappro, name='demande_reappro'),
+    path('caisse/<int:magasin_id>/', interface_caisse, name='menu_caisse'),
+
+    # 1. Recherche de produit
+    path(
+      'caisse/<int:magasin_id>/recherche/',
+      recherche_produit,
+      name='recherche_produit'
+    ),
+
+    # 2. Enregistrer une vente
+    path(
+      'caisse/<int:magasin_id>/vente/',
+      enregistrer_vente,
+      name='enregistrer_vente'
+    ),
+
+    # 3. Traiter un retour
+    path(
+      'caisse/<int:magasin_id>/retour/',
+      traiter_retour,
+      name='traiter_retour'
+    ),
+
+    # 4. Consulter le stock (vous l’aviez déjà)
+    path(
+      'caisse/<int:magasin_id>/stock/',
+      stock_magasin,
+      name='stock_magasin'
+    ),
+
+    # 5. Historique des transactions
+    path(
+      'caisse/<int:magasin_id>/historique/',
+      historique_transactions,
+      name='historique_transactions'
+    ),
+
 ]

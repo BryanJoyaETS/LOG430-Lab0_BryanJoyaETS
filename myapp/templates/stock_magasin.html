@@ -26,19 +26,30 @@
             text-align: left;
         }
 
-        .back-button {
+        .back-button,
+        .reappro-button {
             display: inline-block;
-            background-color: #007BFF;
             color: white;
             padding: 8px 12px;
             text-decoration: none;
             border-radius: 5px;
             font-weight: bold;
             transition: background 0.3s ease;
+            margin-top: 10px;
         }
 
+        .back-button {
+            background-color: #007BFF;
+        }
         .back-button:hover {
             background-color: #0056b3;
+        }
+
+        .reappro-button {
+            background-color: #28a745;
+        }
+        .reappro-button:hover {
+            background-color: #218838;
         }
     </style>
 </head>
@@ -49,6 +60,9 @@
             <div class="stock-card">
                 <h2>{{ stock.produit.nom }}</h2>
                 <p><strong>Quantité disponible :</strong> {{ stock.quantite }}</p>
+                <a href="{% url 'demande_reappro' stock.id %}" class="reappro-button">
+                    Demande de réapprovisionnement
+                </a>
             </div>
         {% empty %}
             <p>Aucun produit en stock pour ce magasin.</p>

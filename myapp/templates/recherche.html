@@ -1,118 +1,100 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Recherche de produit</title>
-    <style>
-        /* Style global de la page */
-        body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background-color: #fdfdfd;
-            color: #333;
-            margin: 0;
-            padding: 20px;
-        }
-        /* Conteneur central pour le contenu */
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: #fff;
-            padding: 30px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        /* Style du titre principal */
-        h1 {
-            text-align: center;
-            color: #007bff;
-            margin-bottom: 20px;
-        }
-        /* Style du formulaire */
-        form {
-            margin-bottom: 30px;
-        }
-        label {
-            display: block;
-            margin-top: 10px;
-            font-weight: bold;
-        }
-        input[type="text"] {
-            width: 100%;
-            padding: 8px 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            margin-bottom: 10px;
-        }
-        input[type="submit"] {
-            margin-top: 20px;
-            background-color: #007bff;
-            color: #fff;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        input[type="submit"]:hover {
-            background-color: #0056b3;
-        }
-        /* Style pour les résultats */
-        h2 {
-            margin-top: 30px;
-            color: #333;
-        }
-        ul {
-            list-style: none;
-            padding: 0;
-        }
-        li {
-            background: #f8f8f8;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 15px;
-            margin-bottom: 10px;
-            transition: background-color 0.3s ease;
-        }
-        li:hover {
-            background-color: #e9f4ff;
-        }
-        /* Style pour le lien de retour */
-        a {
-            color: #007bff;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Rechercher un produit – {{ magasin.nom }}</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 40px;
+      text-align: center;
+    }
+    .card {
+      background: white;
+      display: inline-block;
+      padding: 20px 30px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      max-width: 400px;
+      width: 100%;
+    }
+    form input {
+      width: 100%;
+      padding: 8px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .btn {
+      background: #007bff;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .btn:hover { background: #0056b3; }
+    .back {
+      display: block;
+      margin-top: 20px;
+      color: #007bff;
+      text-decoration: none;
+    }
+    .error {
+      color: red;
+      margin-bottom: 10px;
+    }
+    .results {
+      text-align: left;
+      margin-top: 20px;
+    }
+    .results ul {
+      list-style: none;
+      padding: 0;
+    }
+    .results li {
+      padding: 6px 0;
+      border-bottom: 1px solid #eee;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Rechercher un produit</h1>
-        <form method="POST" action="">
-            {% csrf_token %}
-            <label for="identifiant">Identifiant :</label>
-            <input type="text" name="identifiant" id="identifiant">
-            <label for="nom">Nom :</label>
-            <input type="text" name="nom" id="nom">
-            <label for="categorie">Catégorie :</label>
-            <input type="text" name="categorie" id="categorie">
-            <input type="submit" value="Rechercher">
-        </form>
+  <div class="card">
+    <h1>Rechercher un produit</h1>
+    <h3>Magasin : {{ magasin.nom }}</h3>
 
-        {% if result %}
-            <h2>Résultats :</h2>
-            <ul>
-                {% for produit in result %}
-                    <li>
-                        <strong>{{ produit.nom }}</strong> — {{ produit.categorie }}<br>
-                        Stock : {{ produit.stock }} — Prix : {{ produit.prix }} €
-                    </li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-        <p><a href="{% url 'index' %}">Retour au menu principal</a></p>
-    </div>
+    {% if message_erreur %}
+      <div class="error">{{ message_erreur }}</div>
+    {% endif %}
+
+    <form method="post" action="{% url 'recherche_produit' magasin.id %}">
+      {% csrf_token %}
+      <input type="text" name="identifiant" placeholder="ID du produit">
+      <input type="text" name="nom"        placeholder="Nom du produit">
+      <input type="text" name="categorie"  placeholder="Catégorie">
+      <button type="submit" class="btn">Rechercher</button>
+    </form>
+
+    {% if resultats %}
+      <div class="results">
+        <h4>Résultats :</h4>
+        <ul>
+          {% for p in resultats %}
+            <li>
+              {{ p.id }} – <strong>{{ p.nom }}</strong>
+              {% if p.categorie %} ({{ p.categorie }}){% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <a href="{% url 'menu_caisse' magasin.id %}" class="back">
+      ← Retour au menu de la caisse
+    </a>
+  </div>
 </body>
 </html>

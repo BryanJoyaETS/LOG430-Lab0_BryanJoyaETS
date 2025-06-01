@@ -1,129 +1,186 @@
 # myapp/views.py
 import datetime
 from django.shortcuts import get_object_or_404, render, redirect
-from .models import LigneVente, Magasin, Produit, Stock, Vente  # and import other needed models or logic
+from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Sum
+from .models import Magasin, Produit, Stock, Vente, LigneVente
+# si vous avez des forms, importez-les ici
+# from .forms import DemandeReapproForm, VenteForm, RetourForm
 
-def recherche_produit(request):
-    result = None
+def afficher_magasins(request):
+    """UC0 – Page d’accueil : liste paginée des magasins."""
+    magasins_list = Magasin.objects.all()
+    paginator     = Paginator(magasins_list, 10)  # 10 par page
+    page_number   = request.GET.get('page')
+    magasins      = paginator.get_page(page_number)
+    return render(request, 'index.html', {'magasins': magasins})
+
+
+def interface_caisse(request, magasin_id):
+    """UC2 – Menu de la caisse pour un magasin donné."""
+    magasin = get_object_or_404(Magasin, id=magasin_id)
+    return render(request, 'menu_caisse.html', {'magasin': magasin})
+
+
+def recherche_produit(request, magasin_id):
+    """UC2.1 – Recherche produit (POST) pour la caisse."""
+    magasin       = get_object_or_404(Magasin, id=magasin_id)
+    resultats     = None
+    message_erreur= None
+
     if request.method == "POST":
         identifiant = request.POST.get('identifiant')
-        nom = request.POST.get('nom')
-        categorie = request.POST.get('categorie')
-        
-        # Convert identifiant to int if provided.
+        nom         = request.POST.get('nom')
+        categorie   = request.POST.get('categorie')
+
+        # Validation de l’ID
         try:
             identifiant = int(identifiant) if identifiant else None
         except ValueError:
-            result = "Identifiant invalide."
-        else:
-            # Here you would implement the search logic.
-            query = {}
+            message_erreur = "Identifiant invalide."
+
+        if not message_erreur:
+            filtres = {}
             if identifiant is not None:
-                query['id'] = identifiant
+                filtres['id'] = identifiant
             if nom:
-                query['nom__icontains'] = nom
+                filtres['nom__icontains'] = nom
             if categorie:
-                query['categorie__icontains'] = categorie
+                filtres['categorie__icontains'] = categorie
 
-            if query:
-                produits = Produit.objects.filter(**query)
-                if produits.exists():
-                    result = produits
+            if filtres:
+                qs = Produit.objects.filter(**filtres)
+                if qs.exists():
+                    resultats = qs
+                else:
+                    message_erreur = "Aucun produit trouvé."
+            else:
+                message_erreur = "Veuillez remplir au moins un critère."
+
+    return render(request, 'recherche.html', {
+        'magasin':        magasin,
+        'resultats':      resultats,
+        'message_erreur': message_erreur
+    })
 
 
-            if not result:
-                result = "Aucun produit trouvé."
-    return render(request, 'recherche.html', {'result': result})
-
-def enregistrer_vente(request):
+def enregistrer_vente(request, magasin_id):
+    """UC2.2 – Enregistrer une vente pour la caisse."""
+    magasin = get_object_or_404(Magasin, id=magasin_id)
     message = ""
+
     if request.method == "POST":
-        # Here you would process the sale.
-        # For example, you might extract a list of products and their quantities:
-        produits = []
-        # (A more complex implementation may involve dynamic forms or JavaScript.)
         produit_id = request.POST.get('produit_id')
-        quantite = request.POST.get('quantite')
+        quantite   = request.POST.get('quantite')
         try:
             produit_id = int(produit_id)
-            quantite = int(quantite)
-            # Call your function to record the sale.
-            # caisse.enregistrer_vente([(produit_id, quantite)])
+            quantite   = int(quantite)
+            # Ici, votre logique d’enregistrement de vente,
+            # e.g. créer un objet Vente + LigneVente(s)
             message = "Vente enregistrée avec succès."
-        except ValueError:
-            message = "Entrée invalide, veuillez saisir des entiers."
-    return render(request, 'vente.html', {'message': message})
+        except (ValueError, Produit.DoesNotExist):
+            message = "Entrée invalide, veuillez saisir des identifiants existants."
 
-def traiter_retour(request):
+    return render(request, 'vente.html', {
+        'magasin': magasin,
+        'message': message
+    })
+
+
+def traiter_retour(request, magasin_id):
+    """UC2.3 – Traiter un retour pour la caisse."""
+    magasin = get_object_or_404(Magasin, id=magasin_id)
     message = ""
+
     if request.method == "POST":
         vente_id = request.POST.get('vente_id')
         try:
             vente_id = int(vente_id)
-            # Call your logic to process the return.
-            # caisse.gerer_retour(vente_id)
+            # Votre logique de retour ici
             message = "Retour traité avec succès."
         except ValueError:
             message = "ID de vente invalide."
-    return render(request, 'retour.html', {'message': message})
 
-def consulter_stock(request):
-    produits = Produit.objects.all()  # Récupère tous les produits
-    return render(request, 'stock.html', {'produits': produits})
+    return render(request, 'retour.html', {
+        'magasin': magasin,
+        'message': message
+    })
 
-def historique_transactions(request):
-    # Récupère toutes les ventes triées par date décroissante
-    ventes = Vente.objects.order_by('-date').prefetch_related('lignes')
-    return render(request, 'historique.html', {'ventes': ventes})
-
-def afficher_magasins(request):
-    magasins_list = Magasin.objects.all()
-    paginator = Paginator(magasins_list, 10)  # Affiche 10 magasins par page
-    page_number = request.GET.get('page')
-    magasins = paginator.get_page(page_number)
-    return render(request, 'index.html', {'magasins': magasins})
 
 def stock_magasin(request, magasin_id):
-    magasin = get_object_or_404(Magasin, id=magasin_id)  # Vérifie que le magasin existe
-    stocks = Stock.objects.filter(magasin=magasin)  # Filtre le stock du magasin
-    return render(request, 'stock_magasin.html', {'magasin': magasin, 'stocks': stocks})
+    """UC2.4 – Consulter le stock d’un magasin (pour la caisse)."""
+    magasin = get_object_or_404(Magasin, id=magasin_id)
+    stocks  = Stock.objects.filter(magasin=magasin)
+    return render(request, 'stock_magasin.html', {
+        'magasin': magasin,
+        'stocks':  stocks
+    })
+
+
+def historique_transactions(request, magasin_id):
+    """UC2.5 – Historique des transactions d’un magasin."""
+    magasin      = get_object_or_404(Magasin, id=magasin_id)
+    ventes       = (Vente.objects
+                    .filter(magasin=magasin)
+                    .order_by('-date')
+                    .prefetch_related('lignes'))
+    return render(request, 'historique.html', {
+        'magasin':    magasin,
+        'ventes':     ventes
+    })
+
 
 def generer_rapport(request):
-    # Chiffre d’affaires par magasin
-    ventes_par_magasin = Vente.objects.values('magasin__nom').annotate(chiffre_affaires=Sum('lignes__quantite') * Sum('lignes__prix_unitaire'))
-
-    # Produits les plus vendus
-    produits_populaires = LigneVente.objects.values('produit__nom').annotate(total_vendu=Sum('quantite')).order_by('-total_vendu')[:5]
-
-    # Stocks restants par magasin
-    stock_restant = Stock.objects.values('magasin__nom', 'produit__nom', 'quantite')
+    """UC1 – Rapport consolidé des ventes (maison mère)."""
+    ventes_par_magasin = (Vente.objects
+                          .values('magasin__nom')
+                          .annotate(
+                            chiffre_affaires=Sum('lignes__quantite')
+                                            * Sum('lignes__prix_unitaire')
+                          ))
+    produits_populaires= (LigneVente.objects
+                          .values('produit__nom')
+                          .annotate(total_vendu=Sum('quantite'))
+                          .order_by('-total_vendu')[:5])
+    stock_restant     = Stock.objects.values(
+                          'magasin__nom', 'produit__nom', 'quantite')
 
     return render(request, 'rapport_de_ventes.html', {
-        'ventes_par_magasin': ventes_par_magasin,
+        'ventes_par_magasin':  ventes_par_magasin,
         'produits_populaires': produits_populaires,
-        'stock_restant': stock_restant
+        'stock_restant':       stock_restant
     })
 
 
 def tableau_bord(request):
-    # Chiffre d’affaires par magasin
-    chiffre_affaires = Vente.objects.values('magasin__nom').annotate(total=Sum('lignes__quantite') * Sum('lignes__prix_unitaire'))
-
-    # Produits en rupture de stock
-    ruptures_stock = Stock.objects.filter(quantite__lte=5).values('magasin__nom', 'produit__nom', 'quantite')
-
-    # Produits en surstock (quantité > 100)
-    surstock = Stock.objects.filter(quantite__gte=100).values('magasin__nom', 'produit__nom', 'quantite')
-
-    # Tendances hebdomadaires
+    """UC3 – Tableau de bord synthétique (maison mère)."""
+    chiffre_affaires = (Vente.objects
+                        .values('magasin__nom')
+                        .annotate(
+                          total=Sum('lignes__quantite')
+                                * Sum('lignes__prix_unitaire')
+                        ))
+    ruptures_stock   = Stock.objects.filter(quantite__lte=5).values(
+                          'magasin__nom', 'produit__nom', 'quantite')
+    surstock         = Stock.objects.filter(quantite__gte=100).values(
+                          'magasin__nom', 'produit__nom', 'quantite')
     semaine_derniere = datetime.datetime.now() - datetime.timedelta(days=7)
-    tendances = Vente.objects.filter(date__gte=semaine_derniere).values('magasin__nom').annotate(total_ventes=Sum('lignes__quantite'))
+    tendances        = (Vente.objects
+                        .filter(date__gte=semaine_derniere)
+                        .values('magasin__nom')
+                        .annotate(total_ventes=Sum('lignes__quantite')))
 
     return render(request, 'tableau_de_bord.html', {
         'chiffre_affaires': chiffre_affaires,
-        'ruptures_stock': ruptures_stock,
-        'surstock': surstock,
-        'tendances': tendances
+        'ruptures_stock':   ruptures_stock,
+        'surstock':         surstock,
+        'tendances':        tendances
     })
+
+
+def demande_reappro(request, stock_id):
+    """UC4 – Demande de réapprovisionnement."""
+    stock = get_object_or_404(Stock, id=stock_id)
+    stock.quantite += 0  # si vous gérez directement ici
+    stock.save()        #
