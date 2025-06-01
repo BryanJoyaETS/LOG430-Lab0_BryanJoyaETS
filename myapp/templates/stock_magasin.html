@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Stock - {{ magasin.nom }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .stock-card {
+            background: white;
+            padding: 15px;
+            width: 300px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            text-align: left;
+        }
+
+        .back-button {
+            display: inline-block;
+            background-color: #007BFF;
+            color: white;
+            padding: 8px 12px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Stock du magasin : {{ magasin.nom }}</h1>
+    <div class="container">
+        {% for stock in stocks %}
+            <div class="stock-card">
+                <h2>{{ stock.produit.nom }}</h2>
+                <p><strong>Quantité disponible :</strong> {{ stock.quantite }}</p>
+            </div>
+        {% empty %}
+            <p>Aucun produit en stock pour ce magasin.</p>
+        {% endfor %}
+    </div>
+    <br>
+    <a href="{% url 'index' %}" class="back-button">Retour à la liste des magasins</a>
+</body>
+</html>

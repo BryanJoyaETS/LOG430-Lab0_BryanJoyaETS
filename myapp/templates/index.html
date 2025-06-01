@@ -1,58 +1,79 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <title>Interface de la Caisse</title>
+    <meta charset="UTF-8">
+    <title>Liste des 5 Magasins</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
+            background-color: #f4f4f4;
+            text-align: center;
             margin: 0;
             padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
+
         h1 {
             color: #333;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            width: 100%;
-            max-width: 600px;
+
+        .container {
+            display: flex;
+            justify-content: center;
+            gap: 40px; /* Augmente la séparation entre les magasins */
+            flex-wrap: wrap;
         }
-        li {
-            background-color: #fff;
-            margin: 10px 0;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
+
+        .magasin-card {
+            background: white;
+            padding: 20px;
+            width: 280px;
+            box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #ddd; /* Bordure légère */
         }
-        li:hover {
-            transform: scale(1.02);
-        }
-        a {
-            display: block;
-            padding: 15px 20px;
-            color: #0077cc;
+
+        .button {
+            display: inline-block;
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 15px;
             text-decoration: none;
-            font-size: 18px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            transition: background 0.3s ease;
+            margin-top: 10px;
         }
-        a:hover {
-            background-color: #e6f2ff;
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        .report-section {
+            margin-top: 40px;
         }
     </style>
 </head>
 <body>
-    <h1>Menu de la caisse</h1>
-    <ul>
-        <li><a href="{% url 'recherche_produit' %}">1. Rechercher un produit</a></li>
-        <li><a href="{% url 'enregistrer_vente' %}">2. Enregistrer une vente</a></li>
-        <li><a href="{% url 'traiter_retour' %}">3. Traiter un retour</a></li>
-        <li><a href="{% url 'consulter_stock' %}">4. Consulter le stock</a></li>
-        <li><a href="{% url 'historique_transactions' %}">5. Consulter l'historique des transactions</a></li>
-    </ul>
+    <h1>Liste des 5 Magasins</h1>
+    <div class="container">
+        {% for magasin in magasins %}
+            <div class="magasin-card">
+                <h2>{{ magasin.nom }}</h2>
+                <p><strong>Adresse :</strong> {{ magasin.adresse }}</p>
+                <a href="{% url 'stock_magasin' magasin.id %}" class="button">Voir le stock</a>
+            </div>
+        {% empty %}
+            <p>Aucun magasin disponible.</p>
+        {% endfor %}
+    </div>
+
+    <div class="report-section">
+        <h2>Outils d’analyse</h2>
+        <a href="{% url 'generer_rapport' %}" class="button">Générer un rapport consolidé</a>
+        <a href="{% url 'tableau_bord' %}" class="button">Visualiser les performances</a>
+    </div>
 </body>
 </html>

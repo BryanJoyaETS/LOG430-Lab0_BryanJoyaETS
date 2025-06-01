@@ -18,15 +18,17 @@ from django.contrib import admin
 from django.urls import path
 from django.contrib import admin
 from django.urls import path
-from myapp.views import index, recherche_produit, enregistrer_vente, traiter_retour, consulter_stock, historique_transactions
+from myapp.views import generer_rapport, recherche_produit, enregistrer_vente, tableau_bord, traiter_retour, consulter_stock, historique_transactions, afficher_magasins, stock_magasin
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', index, name='index'),
+    path('', afficher_magasins, name='index'),
     path('recherche/', recherche_produit, name='recherche_produit'),
     path('vente/', enregistrer_vente, name='enregistrer_vente'),
     path('retour/', traiter_retour, name='traiter_retour'),
     path('stock/', consulter_stock, name='consulter_stock'),
     path('historique/', historique_transactions, name='historique_transactions'),
-
+    path('stock/<int:magasin_id>/', stock_magasin, name='stock_magasin'),
+    path('rapport/', generer_rapport, name='generer_rapport'),
+    path('dashboard/', tableau_bord, name='tableau_bord')
 ]
