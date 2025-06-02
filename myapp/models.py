@@ -44,6 +44,7 @@ class Vente(models.Model):
     """
     date = models.DateTimeField(auto_now_add=True)
     magasin = models.ForeignKey(Magasin, on_delete=models.CASCADE, related_name='ventes')
+    est_retournee = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Vente {self.id} on {self.date}"

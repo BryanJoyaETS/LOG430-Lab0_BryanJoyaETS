@@ -125,50 +125,50 @@ def enregistrer_vente(request, magasin_id):
 
 def traiter_retour(request, magasin_id):
     """
-    Traite un retour en annulant une vente.
-    L'utilisateur saisit l'ID d'une vente. Pour chaque ligne de cette vente,
-    le nombre de produits vendus est réintégré dans le stock du magasin.
-    La vente est marquée comme retournée pour éviter un double traitement.
+    Annule une vente en réintégrant les quantités vendues dans le stock 
+    et en supprimant la vente (ainsi que ses lignes associées, grâce au CASCADE).
     """
     magasin = get_object_or_404(Magasin, id=magasin_id)
-    message = ""
+    message = None
 
     if request.method == "POST":
         vente_id_input = request.POST.get("vente_id", "").strip()
         
+        # Conversion de l'ID de vente
         try:
             vente_id = int(vente_id_input)
         except ValueError:
             message = "ID de vente invalide."
         else:
             try:
-                vente = Vente.objects.get(id=vente_id)
+                # On vérifie que la vente existe et qu'elle appartient au magasin courant
+                vente = Vente.objects.get(id=vente_id, magasin=magasin)
             except Vente.DoesNotExist:
-                message = "Vente introuvable."
+                message = "Vente introuvable dans ce magasin."
             else:
-                if vente.magasin.id != magasin.id:
-                    message = "La vente ne correspond pas à ce magasin."
-                elif vente.est_retournee:
-                    message = "Ce retour a déjà été traité pour cette vente."
-                else:
+                # Procéder au retour dans une transaction atomique
+                try:
                     with transaction.atomic():
-                        # Pour chaque ligne de vente, mettre à jour le stock.
+                        # Pour chaque ligne de vente, on augmente le stock du produit
                         for ligne in vente.lignes.all():
                             try:
                                 stock = Stock.objects.get(magasin=magasin, produit=ligne.produit)
                             except Stock.DoesNotExist:
-                                # Si aucun stock n'existe pour le produit, vous pouvez décider de l'ignorer
-                                # ou de créer un nouvel enregistrement.
-                                continue
-                            
+                                # Si aucun stock n'existe pour ce produit, on le crée
+                                stock = Stock.objects.create(
+                                    magasin=magasin,
+                                    produit=ligne.produit,
+                                    quantite=0
+                                )
                             stock.quantite += ligne.quantite
                             stock.save()
                         
-                        # Marquer la vente comme retournée
-                        vente.est_retournee = True
-                        vente.save()
-                        
-                        message = f"Retour traité pour la vente {vente.id}."
+                        # Supprimer la vente (les lignes associées sont supprimées en cascade)
+                        vente.delete()
+                    
+                    message = f"Retour traité : la vente {vente_id} a été annulée et le stock mis à jour."
+                except Exception as e:
+                    message = f"Erreur lors du traitement du retour: {e}"
 
     return render(request, "retour.html", {"magasin": magasin, "message": message})
 
