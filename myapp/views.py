@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Sum
 from .models import Magasin, Produit, Stock, Vente, LigneVente
+from django.db import transaction
 # si vous avez des forms, importez-les ici
 # from .forms import DemandeReapproForm, VenteForm, RetourForm
 
@@ -25,14 +26,14 @@ def interface_caisse(request, magasin_id):
 
 def recherche_produit(request, magasin_id):
     """UC2.1 – Recherche produit (POST) pour la caisse."""
-    magasin       = get_object_or_404(Magasin, id=magasin_id)
-    resultats     = None
-    message_erreur= None
+    magasin = get_object_or_404(Magasin, id=magasin_id)
+    resultats = None
+    message_erreur = None
 
     if request.method == "POST":
         identifiant = request.POST.get('identifiant')
-        nom         = request.POST.get('nom')
-        categorie   = request.POST.get('categorie')
+        nom = request.POST.get('nom')
+        categorie = request.POST.get('categorie')
 
         # Validation de l’ID
         try:
@@ -43,14 +44,15 @@ def recherche_produit(request, magasin_id):
         if not message_erreur:
             filtres = {}
             if identifiant is not None:
-                filtres['id'] = identifiant
+                filtres['produit__id'] = identifiant
             if nom:
-                filtres['nom__icontains'] = nom
+                filtres['produit__nom__icontains'] = nom
             if categorie:
-                filtres['categorie__icontains'] = categorie
+                filtres['produit__categorie__icontains'] = categorie
 
             if filtres:
-                qs = Produit.objects.filter(**filtres)
+                # On recherche parmi les stocks du magasin
+                qs = Stock.objects.filter(magasin=magasin, **filtres)
                 if qs.exists():
                     resultats = qs
                 else:
@@ -59,53 +61,117 @@ def recherche_produit(request, magasin_id):
                 message_erreur = "Veuillez remplir au moins un critère."
 
     return render(request, 'recherche.html', {
-        'magasin':        magasin,
-        'resultats':      resultats,
+        'magasin': magasin,
+        'resultats': resultats,
         'message_erreur': message_erreur
     })
 
 
+
 def enregistrer_vente(request, magasin_id):
     """UC2.2 – Enregistrer une vente pour la caisse."""
+   # views.py
+    """
+    Enregistre une vente depuis la caisse du magasin.
+    """
     magasin = get_object_or_404(Magasin, id=magasin_id)
-    message = ""
+    message = None
 
     if request.method == "POST":
         produit_id = request.POST.get('produit_id')
-        quantite   = request.POST.get('quantite')
+        quantite = request.POST.get('quantite')
+
+        # Conversion et validation des données
         try:
             produit_id = int(produit_id)
-            quantite   = int(quantite)
-            # Ici, votre logique d’enregistrement de vente,
-            # e.g. créer un objet Vente + LigneVente(s)
-            message = "Vente enregistrée avec succès."
-        except (ValueError, Produit.DoesNotExist):
-            message = "Entrée invalide, veuillez saisir des identifiants existants."
+            quantite = int(quantite)
+        except (TypeError, ValueError):
+            message = "Les données saisies sont invalides."
+        
+        if quantite <= 0:
+            message = "La quantité doit être positive."
 
-    return render(request, 'vente.html', {
-        'magasin': magasin,
-        'message': message
+        if not message:
+            try:
+                # Recherche le stock correspondant à ce produit dans ce magasin.
+                stock = Stock.objects.get(magasin=magasin, produit__id=produit_id)
+            except Stock.DoesNotExist:
+                message = "Produit introuvable dans ce magasin."
+            else:
+                if stock.quantite < quantite:
+                    message = "Stock insuffisant pour cette vente."
+                else:
+                    # Utiliser une transaction pour garantir une mise à jour cohérente.
+                    with transaction.atomic():
+                        # Création de la vente.
+                        vente = Vente.objects.create(magasin=magasin)
+                        # Création de la ou des lignes de vente.
+                        LigneVente.objects.create(
+                            vente=vente,
+                            produit=stock.produit,
+                            quantite=quantite,
+                            prix_unitaire=stock.produit.prix
+                        )
+                        # Mise à jour du stock.
+                        stock.quantite -= quantite
+                        stock.save()
+                    
+                    message = f"Vente enregistrée : {quantite} x {stock.produit.nom}."
+    
+    return render(request, "vente.html", {
+        "magasin": magasin,
+        "message": message,
     })
 
-
 def traiter_retour(request, magasin_id):
-    """UC2.3 – Traiter un retour pour la caisse."""
+    """
+    Traite un retour en annulant une vente.
+    L'utilisateur saisit l'ID d'une vente. Pour chaque ligne de cette vente,
+    le nombre de produits vendus est réintégré dans le stock du magasin.
+    La vente est marquée comme retournée pour éviter un double traitement.
+    """
     magasin = get_object_or_404(Magasin, id=magasin_id)
     message = ""
 
     if request.method == "POST":
-        vente_id = request.POST.get('vente_id')
+        vente_id_input = request.POST.get("vente_id", "").strip()
+        
         try:
-            vente_id = int(vente_id)
-            # Votre logique de retour ici
-            message = "Retour traité avec succès."
+            vente_id = int(vente_id_input)
         except ValueError:
             message = "ID de vente invalide."
+        else:
+            try:
+                vente = Vente.objects.get(id=vente_id)
+            except Vente.DoesNotExist:
+                message = "Vente introuvable."
+            else:
+                if vente.magasin.id != magasin.id:
+                    message = "La vente ne correspond pas à ce magasin."
+                elif vente.est_retournee:
+                    message = "Ce retour a déjà été traité pour cette vente."
+                else:
+                    with transaction.atomic():
+                        # Pour chaque ligne de vente, mettre à jour le stock.
+                        for ligne in vente.lignes.all():
+                            try:
+                                stock = Stock.objects.get(magasin=magasin, produit=ligne.produit)
+                            except Stock.DoesNotExist:
+                                # Si aucun stock n'existe pour le produit, vous pouvez décider de l'ignorer
+                                # ou de créer un nouvel enregistrement.
+                                continue
+                            
+                            stock.quantite += ligne.quantite
+                            stock.save()
+                        
+                        # Marquer la vente comme retournée
+                        vente.est_retournee = True
+                        vente.save()
+                        
+                        message = f"Retour traité pour la vente {vente.id}."
 
-    return render(request, 'retour.html', {
-        'magasin': magasin,
-        'message': message
-    })
+    return render(request, "retour.html", {"magasin": magasin, "message": message})
+
 
 
 def stock_magasin(request, magasin_id):

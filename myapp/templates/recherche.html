@@ -79,18 +79,20 @@
     </form>
 
     {% if resultats %}
-      <div class="results">
-        <h4>Résultats :</h4>
-        <ul>
-          {% for p in resultats %}
-            <li>
-              {{ p.id }} – <strong>{{ p.nom }}</strong>
-              {% if p.categorie %} ({{ p.categorie }}){% endif %}
-            </li>
-          {% endfor %}
-        </ul>
-      </div>
+    <div class="results">
+      <h4>Résultats :</h4>
+      <ul>
+        {% for stock in resultats %}
+          <li>
+            {{ stock.produit.id }} – <strong>{{ stock.produit.nom }}</strong>
+            {% if stock.produit.categorie %} ({{ stock.produit.categorie }}){% endif %}
+            – Stock: {{ stock.quantite }}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
     {% endif %}
+
 
     <a href="{% url 'menu_caisse' magasin.id %}" class="back">
       ← Retour au menu de la caisse
