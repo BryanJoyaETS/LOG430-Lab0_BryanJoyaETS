@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Sum
+
 from .models import Magasin, Produit, Stock, Vente, LigneVente
 from django.db import transaction
 # si vous avez des forms, importez-les ici
@@ -199,7 +200,10 @@ def historique_transactions(request, magasin_id):
 
 def generer_rapport(request):
     """UC1 – Rapport consolidé des ventes (maison mère)."""
-    ventes_par_magasin = (Vente.objects
+
+    centre = get_object_or_404(Magasin, nom='CENTRE_LOGISTIQUE')
+
+    ventes_par_magasin = (Vente.objects.exclude(magasin=centre)
                           .values('magasin__nom')
                           .annotate(
                             chiffre_affaires=Sum('lignes__quantite')
@@ -209,7 +213,7 @@ def generer_rapport(request):
                           .values('produit__nom')
                           .annotate(total_vendu=Sum('quantite'))
                           .order_by('-total_vendu')[:5])
-    stock_restant     = Stock.objects.values(
+    stock_restant     = Stock.objects.exclude(magasin=centre).values(
                           'magasin__nom', 'produit__nom', 'quantite')
 
     return render(request, 'rapport_de_ventes.html', {
@@ -221,18 +225,20 @@ def generer_rapport(request):
 
 def tableau_bord(request):
     """UC3 – Tableau de bord synthétique (maison mère)."""
-    chiffre_affaires = (Vente.objects
+    centre = get_object_or_404(Magasin, nom='CENTRE_LOGISTIQUE')
+
+    chiffre_affaires = (Vente.objects.exclude(magasin=centre)
                         .values('magasin__nom')
                         .annotate(
                           total=Sum('lignes__quantite')
                                 * Sum('lignes__prix_unitaire')
                         ))
-    ruptures_stock   = Stock.objects.filter(quantite__lte=5).values(
+    ruptures_stock   = Stock.objects.exclude(magasin=centre).filter(quantite__lte=5).values(
                           'magasin__nom', 'produit__nom', 'quantite')
-    surstock         = Stock.objects.filter(quantite__gte=100).values(
+    surstock         = Stock.objects.exclude(magasin=centre).filter(quantite__gte=100).values(
                           'magasin__nom', 'produit__nom', 'quantite')
     semaine_derniere = datetime.datetime.now() - datetime.timedelta(days=7)
-    tendances        = (Vente.objects
+    tendances        = (Vente.objects.exclude(magasin=centre)
                         .filter(date__gte=semaine_derniere)
                         .values('magasin__nom')
                         .annotate(total_ventes=Sum('lignes__quantite')))
@@ -246,7 +252,52 @@ def tableau_bord(request):
 
 
 def demande_reappro(request, stock_id):
-    """UC4 – Demande de réapprovisionnement."""
-    stock = get_object_or_404(Stock, id=stock_id)
-    stock.quantite += 0  # si vous gérez directement ici
-    stock.save()        #
+    """
+    Permet le réapprovisionnement d'un produit pour un magasin donné en transférant du stock
+    depuis le centre logistique (une instance de Magasin) vers le magasin de l'employé.
+    """
+    # Stock local concerné : il s'agit de la quantité actuelle du produit dans le magasin
+    stock_local = get_object_or_404(Stock, id=stock_id)
+    magasin_local = stock_local.magasin
+    produit = stock_local.produit
+
+    # Récupérer le magasin central (centre logistique) et le stock associé pour le même produit
+    magasin_central = get_object_or_404(Magasin, nom='CENTRE_LOGISTIQUE')
+    stock_central = get_object_or_404(Stock, magasin=magasin_central, produit=produit)
+
+    if request.method == "POST":
+        qte_str = request.POST.get("quantite", "").strip()
+        try:
+            quantite = int(qte_str)
+        except ValueError:
+            messages.error(request, "Veuillez entrer une quantité valide.")
+            return redirect("demande_reappro", stock_id=stock_id)
+
+        if quantite <= 0:
+            messages.error(request, "La quantité doit être supérieure à zéro.")
+            return redirect("demande_reappro", stock_id=stock_id)
+
+        if quantite > stock_central.quantite:
+            messages.error(request, "Stock central insuffisant pour ce produit.")
+            return redirect("demande_reappro", stock_id=stock_id)
+
+        # Effectuer le transfert de stock de manière atomique
+        with transaction.atomic():
+            stock_central.quantite -= quantite
+            stock_central.save()
+            stock_local.quantite += quantite
+            stock_local.save()
+
+        messages.success(
+            request,
+            f"Réapprovisionnement réussi : +{quantite} unité(s) de {produit.nom} ajoutées à {magasin_local.nom}."
+        )
+        return redirect("stock_magasin", magasin_id=magasin_local.id)
+
+    context = {
+        "magasin": magasin_local,
+        "produit": produit,
+        "stock_local": stock_local.quantite,
+        "stock_central": stock_central.quantite,
+    }
+    return render(request, "demande_reappro.html", context)

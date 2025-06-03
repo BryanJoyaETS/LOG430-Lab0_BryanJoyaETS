@@ -63,4 +63,11 @@ urlpatterns = [
       name='historique_transactions'
     ),
 
+    path(
+      "reappro/<int:stock_id>/",
+      demande_reappro, 
+      name="demande_reappro"
+    ),
+
+
 ]
