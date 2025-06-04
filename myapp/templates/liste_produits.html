@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Produits</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .produit {
+            border-bottom: 1px solid #eee;
+            padding: 10px 0;
+        }
+        .produit:last-child {
+            border-bottom: none;
+        }
+        .produit a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+        .produit a:hover {
+            text-decoration: underline;
+        }
+        
+        .back-button {
+            display: inline-block;
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Liste des Produits</h1>
+        {% if produits %}
+            {% for produit in produits %}
+                <div class="produit">
+                    <h2>{{ produit.nom }}</h2>
+                    <p><strong>Catégorie :</strong> {{ produit.categorie|default:"Non définie" }}</p>
+                    <p><strong>Prix :</strong> {{ produit.prix }} €</p>
+                    <a href="{% url 'modifier_produit' produit.id %}">Modifier ce produit</a>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Aucun produit trouvé.</p>
+        {% endif %}
+    </div>
+    <a href="{% url 'index' %}" class="back-button">Retour à l'accueil</a>
+</body>
+</html>

@@ -106,9 +106,11 @@
           <a href="{% url 'stock_magasin' magasin.id %}" class="button">
             Voir le stock
           </a>
-          <a href="{% url 'menu_caisse' magasin.id %}" class="button caisse-button">
-            Ouvrir une caisse
-          </a>
+          {% if magasin.nom != "CENTRE_LOGISTIQUE" %}
+            <a href="{% url 'menu_caisse' magasin.id %}" class="button caisse-button">
+              Ouvrir une caisse
+            </a>
+          {% endif %}
         </div>
       </div>
     {% empty %}
@@ -117,12 +119,18 @@
   </div>
 
   <div class="report-section">
-    <h2>Outils d’analyse</h2>
+    <h2>Fonctions d'administration</h2>
     <a href="{% url 'generer_rapport' %}" class="button">
       Générer un rapport consolidé
     </a>
     <a href="{% url 'tableau_bord' %}" class="button">
       Visualiser les performances
+    </a>
+    <a href="{% url 'traiter_demande_reappro' %}" class="button">
+      Gérer les demandes de réapprovisionnement
+    </a>
+    <a href="{% url 'liste_produits' %}" class="button">
+      Voir la liste des produits
     </a>
   </div>
 </body>

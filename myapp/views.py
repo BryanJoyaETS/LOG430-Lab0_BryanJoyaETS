@@ -1,11 +1,13 @@
 # myapp/views.py
 import datetime
+from decimal import Decimal, InvalidOperation
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Sum
+from django.utils import timezone
 
-from .models import Magasin, Produit, Stock, Vente, LigneVente
+from .models import DemandeReappro, Magasin, Produit, Stock, Vente, LigneVente
 from django.db import transaction
 # si vous avez des forms, importez-les ici
 # from .forms import DemandeReapproForm, VenteForm, RetourForm
@@ -203,7 +205,7 @@ def generer_rapport(request):
 
     centre = get_object_or_404(Magasin, nom='CENTRE_LOGISTIQUE')
 
-    ventes_par_magasin = (Vente.objects.exclude(magasin=centre)
+    ventes_par_magasin = (Vente.objects.exclude(magasin=centre).order_by('magasin__nom')
                           .values('magasin__nom')
                           .annotate(
                             chiffre_affaires=Sum('lignes__quantite')
@@ -213,7 +215,7 @@ def generer_rapport(request):
                           .values('produit__nom')
                           .annotate(total_vendu=Sum('quantite'))
                           .order_by('-total_vendu')[:5])
-    stock_restant     = Stock.objects.exclude(magasin=centre).values(
+    stock_restant     = Stock.objects.exclude(magasin=centre).order_by('magasin__nom').values(
                           'magasin__nom', 'produit__nom', 'quantite')
 
     return render(request, 'rapport_de_ventes.html', {
@@ -227,7 +229,7 @@ def tableau_bord(request):
     """UC3 – Tableau de bord synthétique (maison mère)."""
     centre = get_object_or_404(Magasin, nom='CENTRE_LOGISTIQUE')
 
-    chiffre_affaires = (Vente.objects.exclude(magasin=centre)
+    chiffre_affaires = (Vente.objects.exclude(magasin=centre).order_by('magasin__nom')
                         .values('magasin__nom')
                         .annotate(
                           total=Sum('lignes__quantite')
@@ -301,3 +303,145 @@ def demande_reappro(request, stock_id):
         "stock_central": stock_central.quantite,
     }
     return render(request, "demande_reappro.html", context)
+
+def demande_reappro_utilisateur(request, stock_id):
+    """
+    Interface pour l'employé d’un magasin :
+    - Affiche le stock local et le stock central (du centre logistique).
+    - Permet de saisir une quantité pour créer une demande de réapprovisionnement.
+    """
+    # Stock local dans le magasin courant
+    stock_local = get_object_or_404(Stock, id=stock_id)
+    magasin_local = stock_local.magasin
+    produit = stock_local.produit
+
+    # Récupérer l'instance du magasin central par son nom
+    magasin_central = get_object_or_404(Magasin, nom='CENTRE_LOGISTIQUE')
+    stock_central = get_object_or_404(Stock, magasin=magasin_central, produit=produit)
+
+    if request.method == "POST":
+        qte_str = request.POST.get("quantite", "").strip()
+        try:
+            quantite = int(qte_str)
+        except ValueError:
+            messages.error(request, "Veuillez entrer une quantité valide.")
+            return redirect("demande_reappro_utilisateur", stock_id=stock_id)
+
+        if quantite <= 0:
+            messages.error(request, "La quantité doit être supérieure à zéro.")
+            return redirect("demande_reappro_utilisateur", stock_id=stock_id)
+
+        # Même si l'employé consulte le stock central, on ne fait pas le transfert directement.
+        # Il s'agit d'une demande qui attend d'être approuvée par le responsable logistique.
+        DemandeReappro.objects.create(
+            magasin=magasin_local,
+            produit=produit,
+            quantite=quantite,
+            statut='pending'
+        )
+        messages.success(request, "Demande de réapprovisionnement envoyée.")
+        return redirect("stock_magasin", magasin_id=magasin_local.id)
+
+    context = {
+        "magasin": magasin_local,
+        "produit": produit,
+        "stock_local": stock_local.quantite,
+        "stock_central": stock_central.quantite,
+    }
+    return render(request, "demande_reappro_utilisateur.html", context)
+
+def traiter_demande_reappro(request):
+    """
+    Interface du responsable logistique pour traiter les demandes de réapprovisionnement.
+    Le responsable peut approuver une demande (si le stock central est suffisant)
+    ou la refuser. En cas d'approbation, le stock central est décrémenté et le stock
+    du magasin demandeur incrémenté, le tout dans une transaction atomique.
+    """
+    demandes = DemandeReappro.objects.filter(statut='pending').select_related('magasin', 'produit')
+
+    if request.method == "POST":
+        demande_id = request.POST.get("demande_id")
+        action = request.POST.get("action")  # "approve" ou "refuse"
+        demande = get_object_or_404(DemandeReappro, id=demande_id, statut='pending')
+
+        # Récupération de l'instance du centre logistique par son nom
+        centre = get_object_or_404(Magasin, nom="CENTRE_LOGISTIQUE")
+        # Stock du centre pour le produit concerné par la demande
+        stock_centre = get_object_or_404(Stock, magasin=centre, produit=demande.produit)
+
+        if action == "approve":
+            if stock_centre.quantite < demande.quantite:
+                messages.error(request, "Stock central insuffisant pour approuver la demande.")
+                demande.statut = 'refused'
+            else:
+                with transaction.atomic():
+                    stock_centre.quantite -= demande.quantite
+                    stock_centre.save()
+
+                    # Mise à jour du stock local pour le magasin demandeur
+                    stock_local, created = Stock.objects.get_or_create(
+                        magasin=demande.magasin,
+                        produit=demande.produit,
+                        defaults={"quantite": 0}
+                    )
+                    stock_local.quantite += demande.quantite
+                    stock_local.save()
+
+                    demande.statut = 'approved'
+            demande.date_traitement = timezone.now()
+            demande.save()
+
+        elif action == "refuse":
+            demande.statut = 'refused'
+            demande.date_traitement = timezone.now()
+            demande.save()
+
+        return redirect("traiter_demande_reappro")
+
+    context = {"demandes": demandes}
+    return render(request, "traiter_demande_reappro.html", context)
+
+def modifier_produit(request, produit_id):
+    """
+    Permet au responsable de modifier un produit sans utiliser de Django Form.
+    Les nouvelles valeurs sont extraites de request.POST puis appliquées à l'instance Produit.
+    """
+    produit = get_object_or_404(Produit, id=produit_id)
+    
+    if request.method == "POST":
+        # Extraction des données directement depuis POST
+        nom = request.POST.get("nom", "").strip()
+        categorie = request.POST.get("categorie", "").strip()
+        prix_str = request.POST.get("prix", "").strip()
+        
+        # Validation sommaire
+        if not nom:
+            messages.error(request, "Le nom du produit est requis.")
+            return redirect("modifier_produit", produit_id=produit_id)
+        
+        try:
+            prix = Decimal(prix_str)
+        except (InvalidOperation, TypeError):
+            messages.error(request, "Veuillez entrer un prix valide.")
+            return redirect("modifier_produit", produit_id=produit_id)
+        
+        # Mise à jour de l'instance et sauvegarde
+        produit.nom = nom
+        produit.categorie = categorie  # La catégorie peut être vide
+        produit.prix = prix
+        produit.save()
+        
+        messages.success(request, "Produit mis à jour avec succès - les modifications sont synchronisées dans tous les magasins.")
+        return redirect("liste_produits")  # Redirection vers une vue listant les produits ou une autre page appropriée
+    
+    # Pour une requête GET, on envoie l'objet produit pour pré-remplir le formulaire.
+    context = {"product": produit}
+    return render(request, "modifier_produit.html", context)
+
+def liste_produits(request):
+    """
+    Affiche la liste de tous les produits.
+    Cette vue récupère tous les objets Produit et les transmet au template.
+    """
+    produits = Produit.objects.all().order_by('nom')
+    return render(request, 'liste_produits.html', {'produits': produits})

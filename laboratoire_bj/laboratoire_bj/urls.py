@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from django.contrib import admin
 from django.urls import path
-from myapp.views import demande_reappro, generer_rapport, interface_caisse, recherche_produit, enregistrer_vente, tableau_bord, traiter_retour, historique_transactions, afficher_magasins, stock_magasin
+from myapp.views import demande_reappro, demande_reappro_utilisateur, generer_rapport, interface_caisse, liste_produits, modifier_produit, recherche_produit, enregistrer_vente, tableau_bord, traiter_demande_reappro, traiter_retour, historique_transactions, afficher_magasins, stock_magasin
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -68,6 +68,13 @@ urlpatterns = [
       demande_reappro, 
       name="demande_reappro"
     ),
+
+    path("demande_reappro/<int:stock_id>/", demande_reappro_utilisateur, name="demande_reappro_utilisateur"),
+    path("traiter_demande_reappro/", traiter_demande_reappro, name="traiter_demande_reappro"),
+    path("produit/<int:produit_id>/modifier/", modifier_produit, name="modifier_produit"),
+    path("produits/", liste_produits, name="liste_produits"),
+    
+
 
 
 ]

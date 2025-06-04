@@ -19,7 +19,9 @@
         {% if message %}
             <p>{{ message }}</p>
         {% endif %}
-        <p><a href="{% url 'index' %}">Retour au menu principal</a></p>
+        <p><a href="{% url 'menu_caisse' magasin.id %}" class="back">
+      ← Retour au menu de la caisse
+    </a></p>
     </div>
 </body>
 </html>

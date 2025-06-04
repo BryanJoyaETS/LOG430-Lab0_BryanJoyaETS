@@ -87,3 +87,19 @@ class Stock(models.Model):
     def clean(self):
         if self.quantite < 0:
             raise ValidationError("La quantité en stock ne peut pas être négative.")
+        
+class DemandeReappro(models.Model):
+    STATUTS = (
+        ('pending', 'En attente'),
+        ('approved', 'Approuvée'),
+        ('refused', 'Refusée'),
+    )
+    magasin = models.ForeignKey('Magasin', on_delete=models.CASCADE, related_name='demandes_reappro')
+    produit = models.ForeignKey('Produit', on_delete=models.CASCADE, related_name='demandes_reappro')
+    quantite = models.PositiveIntegerField()
+    statut = models.CharField(max_length=10, choices=STATUTS, default='pending')
+    date_demande = models.DateTimeField(auto_now_add=True)
+    date_traitement = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.quantite} x {self.produit.nom} pour {self.magasin.nom} ({self.get_statut_display()})"
