@@ -25,9 +25,7 @@ jobs:
         run: pylint --fail-under=9 myapp
 
   test:
-    runs-on: ubuntu-latest
-    env:
-      RUN_TESTS: "true"
+    runs-on: ubuntu-latestMore actions
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -50,14 +48,11 @@ jobs:
             sleep 3
           done
 
-      - name: Drop existing test database
-        run: docker-compose exec -T db sh -c "psql -U myuser -d postgres -c 'DROP DATABASE IF EXISTS test_mydatabase;'"
+      - name: Run tests (migrations + tests)
+        run: docker-compose run -e RUN_TESTS=true web
 
-      - name: Run migrations and tests
-        run: docker-compose run --rm web sh -c "python laboratoire_bj/manage.py migrate && python laboratoire_bj/manage.py test myapp"
-
-      - name: Stop containers (and remove volumes)
-        run: docker-compose down -v
+      - name: Stop containers
+        run: docker-compose down
 
   build-and-push:
     runs-on: ubuntu-latest
