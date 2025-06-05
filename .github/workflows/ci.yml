@@ -26,6 +26,8 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    env:
+      RUN_TESTS: "true"
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
