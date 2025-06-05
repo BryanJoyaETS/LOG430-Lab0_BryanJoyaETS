@@ -9,13 +9,11 @@ from django.utils import timezone
 
 from .models import DemandeReappro, Magasin, Produit, Stock, Vente, LigneVente
 from django.db import transaction
-# si vous avez des forms, importez-les ici
-# from .forms import DemandeReapproForm, VenteForm, RetourForm
 
 def afficher_magasins(request):
     """UC0 – Page d’accueil : liste paginée des magasins."""
     magasins_list = Magasin.objects.all()
-    paginator     = Paginator(magasins_list, 10)  # 10 par page
+    paginator     = Paginator(magasins_list, 10) 
     page_number   = request.GET.get('page')
     magasins      = paginator.get_page(page_number)
     return render(request, 'index.html', {'magasins': magasins})

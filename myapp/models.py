@@ -66,7 +66,8 @@ class LigneVente(models.Model):
     prix_unitaire = models.DecimalField(max_digits=10, decimal_places=2)
     
     def __str__(self):
-        return f"{self.quantite} x {self.produit.nom} at {self.prix_unitaire}"
+      return f"{self.quantite} x {self.produit.nom} at {self.prix_unitaire:.2f}"
+
     
 class Stock(models.Model):
     """
