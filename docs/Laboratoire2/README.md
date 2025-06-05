@@ -1,4 +1,13 @@
-cloner le projet : git clone https://github.com/BryanJoyaETS/LOG430-Lab0_BryanJoyaETS.git
+### cloner le projet : git clone https://github.com/BryanJoyaETS/LOG430-Lab0_BryanJoyaETS.git
+
+
+### Exécuter le projet : 
+
+### - docker compose build --no-cache
+### - docker compose up -d db
+### - RUN_TESTS=false docker compose up
+
+
 
 ## 1. Introduction et objectifs
 
