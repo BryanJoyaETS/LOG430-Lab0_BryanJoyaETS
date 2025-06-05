@@ -39,6 +39,3 @@ est une application console locale qui interagit directement avec une base de do
 | **SQLite**                    | Base légère pour les tests        | Ne nécessite pas d’installation, utilisée pour les tests unitaires locaux.                        |
 | **Docker**                    | Conteneurisation de PostgreSQL    | Pour la conteneurisation du logiciel                                                              |
 | **psycopg2**                  | Pilote PostgreSQL pour SQLAlchemy | Driver stable et utilisé pour la connexion à PostgreSQL via SQLAlchemy.                           |
-
-
-test pipeline

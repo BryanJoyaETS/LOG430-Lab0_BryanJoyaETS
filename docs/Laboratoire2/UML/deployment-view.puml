@@ -1,0 +1,20 @@
+@startuml
+allowmixing
+!define RECTANGLE class
+
+node "Serveur Docker Host" {
+    node "Container : web (Django)" as web {
+        RECTANGLE "Application Django\n(laboratoire_bj, myapp)" as django
+    }
+    node "Container : db (PostgreSQL)" as db {
+        RECTANGLE "PostgreSQL 15" as postgres
+    }
+}
+
+web -[#0000FF]-> db : Connexion TCP 5432\n(ORM Django)
+
+cloud "Docker Hub" as dockerhub
+
+web ..> dockerhub : Pull/Push image
+
+@enduml

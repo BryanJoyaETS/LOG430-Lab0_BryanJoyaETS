@@ -1,0 +1,46 @@
+@startuml
+package "laboratoire_bj (Django Project)" {
+    package "laboratoire_bj" {
+        [settings.py]
+        [urls.py]
+        [wsgi.py]
+        [asgi.py]
+    }
+    package "myapp" {
+        [models.py]
+        [views.py]
+        [admin.py]
+        [apps.py]
+        [tests.py]
+        package "templates" {
+            [index.html]
+            [menu_caisse.html]
+            [stock_magasin.html]
+            [etc...]
+        }
+        package "management" {
+            package "commands" {
+                [populer.py]
+            }
+        }
+        package "migrations" {
+            [__init__.py]
+            ...
+        }
+    }
+}
+
+package "Infrastructure" {
+    [Dockerfile]
+    [docker-compose.yml]
+    [requirements.txt]
+}
+
+[laboratoire_bj] ..> [myapp] : "INSTALLED_APPS"
+[myapp] ..> [templates] : "Rendu HTML"
+[myapp] ..> [management] : "Commandes personnalisées"
+[myapp] ..> [migrations] : "Gestion schéma BDD"
+[myapp] ..> [tests.py] : "Tests unitaires"
+[Infrastructure] ..> [laboratoire_bj] : "Déploiement & dépendances"
+
+@enduml

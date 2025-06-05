@@ -1,0 +1,45 @@
+@startuml
+package "Application Django" {
+    package "Modèles" {
+        class Magasin
+        class Produit
+        class Stock
+        class Vente
+        class DemandeReappro
+    }
+
+    package "Vues" {
+        class AfficherMagasins
+        class EnregistrerVente
+        class TableauBord
+        class TraiterDemandeReappro
+    }
+
+    package "Templates" {
+        class index_html
+        class vente_html
+        class tableau_de_bord_html
+        class demande_reappro_html
+    }
+}
+
+' Relations entre les modèles
+Magasin "1" -- "0..*" Stock : contient >
+Produit "1" -- "0..*" Stock : stocké >
+Magasin "1" -- "0..*" Vente : réalise >
+Magasin "1" -- "0..*" DemandeReappro : demande >
+Produit "1" -- "0..*" DemandeReappro : concerne >
+
+' Liens entre les vues et les modèles
+AfficherMagasins ..> Magasin
+EnregistrerVente ..> Vente
+TableauBord ..> Vente
+TableauBord ..> Stock
+TraiterDemandeReappro ..> DemandeReappro
+
+' Liens entre les vues et les templates
+AfficherMagasins ..> index_html
+EnregistrerVente ..> vente_html
+TableauBord ..> tableau_de_bord_html
+TraiterDemandeReappro ..> demande_reappro_html
+@enduml

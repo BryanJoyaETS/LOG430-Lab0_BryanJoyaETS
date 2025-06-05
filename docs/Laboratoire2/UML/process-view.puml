@@ -1,0 +1,11 @@
+@startuml
+actor "Utilisateur Web" as user
+
+rectangle "Processus Django\n(Gestion des requêtes HTTP, ORM, logique métier)" as django
+rectangle "Processus PostgreSQL\n(Gestion de la BDD, transactions)" as postgres
+
+user -> django : Envoi d'une requête HTTP
+django -> postgres : Exécute une requête SQL via l'ORM
+postgres --> django : Retourne les résultats
+django --> user : Réponse HTTP
+@enduml

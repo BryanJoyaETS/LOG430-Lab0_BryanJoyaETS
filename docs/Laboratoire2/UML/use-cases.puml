@@ -1,0 +1,20 @@
+@startuml
+left to right direction
+
+actor "User" as User
+
+rectangle "Application Gestion Magasins" {
+    usecase "UC1 : Générer un rapport consolidé des ventes" as UC1
+    usecase "UC2 : Consulter le stock d'un magasin\net déclencher un réapprovisionnement" as UC2
+    usecase "UC3 : Visualiser les performances\ndes magasins dans un tableau" as UC3
+    usecase "UC4 : Mettre à jour les produits" as UC4
+    usecase "UC6 : Valider une commande de réapprovisionnement" as UC6
+}
+
+User --- UC1
+User --- UC2
+User --- UC3
+User --- UC4
+User --- UC6
+
+@enduml
