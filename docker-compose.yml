@@ -1,22 +1,5 @@
-version: "3.11"
-
 services:
-  web:
-    build: .
-    command: sh -c "python laboratoire_bj/manage.py makemigrations && python laboratoire_bj/manage.py migrate && python laboratoire_bj/manage.py populer && python laboratoire_bj/manage.py runserver 0.0.0.0:5000"
-    container_name: lab0-container-bryanjoya
-    ports:
-      - "5000:5000"
-    environment:
-      - POSTGRES_HOST=db
-      - POSTGRES_DB=mydatabase
-      - POSTGRES_USER=myuser
-      - POSTGRES_PASSWORD=mypassword
-    depends_on:
-      - db
-
   db:
-    restart: unless-stopped
     image: postgres:15
     container_name: my-postgres
     environment:
@@ -27,6 +10,29 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d mydatabase"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    command: sh -c "python laboratoire_bj/manage.py makemigrations && \
+                      python laboratoire_bj/manage.py migrate && \
+                      python laboratoire_bj/manage.py populer && \
+                      python laboratoire_bj/manage.py runserver 0.0.0.0:5000"
+    container_name: lab0-container-bryanjoya
+    ports:
+      - "5000:5000"
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_DB=mydatabase
+      - POSTGRES_USER=myuser
+      - POSTGRES_PASSWORD=mypassword
+    depends_on:
+      db:
+        condition: service_healthy
 
 volumes:
   pgdata:
