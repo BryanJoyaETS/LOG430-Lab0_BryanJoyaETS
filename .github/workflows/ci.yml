@@ -48,14 +48,8 @@ jobs:
             sleep 3
           done
 
-      - name: Run makemigrations
-        run: docker-compose run web python laboratoire_bj/manage.py makemigrations
-
-      - name: Run migrate
-        run: docker-compose run web python laboratoire_bj/manage.py migrate
-
-      - name: Run Django tests via Docker Compose
-        run: docker-compose run web python laboratoire_bj/manage.py test myapp
+      - name: Run migrations and tests
+        run: docker-compose run web sh -c "python laboratoire_bj/manage.py migrate && python laboratoire_bj/manage.py test myapp --keepdb"
 
       - name: Stop containers
         run: docker-compose down
