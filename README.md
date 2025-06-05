@@ -15,6 +15,9 @@ docker compose up -d db
 RUN_TESTS=false docker compose up
 ```
 
+Une fois l'application démarrée, se rendre à l'adresse :  
+[http://10.194.32.198:5000](http://10.194.32.198:5000)
+
 ---
 
 ## Clonage des laboratoires précédents
