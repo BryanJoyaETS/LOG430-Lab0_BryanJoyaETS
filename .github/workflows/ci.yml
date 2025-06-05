@@ -38,6 +38,12 @@ jobs:
       - name: Build and start containers
         run: docker-compose up -d
 
+      - name: Run makemigrations
+        run: docker-compose exec web python laboratoire_bj/manage.py makemigrations
+
+      - name: Run migrate
+        run: docker-compose exec web python laboratoire_bj/manage.py migrate
+
       - name: Run Django tests via Docker Compose
         run: docker-compose exec web python laboratoire_bj/manage.py test myapp
 
