@@ -51,7 +51,7 @@ jobs:
           done
 
       - name: Drop existing test database
-        run: docker-compose exec db sh -c "psql -U myuser -d postgres -c 'DROP DATABASE IF EXISTS test_mydatabase;'"
+        run: docker-compose exec -T db sh -c "psql -U myuser -d postgres -c 'DROP DATABASE IF EXISTS test_mydatabase;'"
 
       - name: Run migrations and tests
         run: docker-compose run --rm web sh -c "python laboratoire_bj/manage.py migrate && python laboratoire_bj/manage.py test myapp"
