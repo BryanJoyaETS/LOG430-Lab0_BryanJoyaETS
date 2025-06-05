@@ -41,4 +41,4 @@ est une application console locale qui interagit directement avec une base de do
 | **psycopg2**                  | Pilote PostgreSQL pour SQLAlchemy | Driver stable et utilisé pour la connexion à PostgreSQL via SQLAlchemy.                           |
 
 
-test pipeline
+test 
