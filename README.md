@@ -23,5 +23,6 @@ RUN_TESTS=false docker compose up
   `git clone` https://github.com/BryanJoyaETS/LOG430-Lab0_BryanJoyaETS/releases/tag/Lab0
 - **Laboratoire 1 :**  
   `git clone` https://github.com/BryanJoyaETS/LOG430-Lab0_BryanJoyaETS/releases/tag/Lab1
-
+- **Laboratoire 2 :**  
+  `git clone` https://github.com/BryanJoyaETS/LOG430-Lab0_BryanJoyaETS/releases/tag/Lab2
 ---
