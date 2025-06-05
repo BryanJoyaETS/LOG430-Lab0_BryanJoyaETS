@@ -7,7 +7,7 @@
 ### - docker compose up -d db
 ### - RUN_TESTS=false docker compose up
 
-
+-------------------------------------------------------------------------------------
 
 ## 1. Introduction et objectifs
 
