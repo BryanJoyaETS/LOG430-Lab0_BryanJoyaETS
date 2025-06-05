@@ -51,7 +51,7 @@ jobs:
           done
 
       - name: Run tests (migrations + tests)
-        run: docker-compose run --rm -e RUN_TESTS=true web
+        run: docker-compose run web
 
       - name: Stop containers
         run: docker-compose down
