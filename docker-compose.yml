@@ -18,6 +18,9 @@ services:
 
   web:
     build: .
+    # La commande vérifie si RUN_TESTS est à "true".
+    # Si c'est le cas, elle exécute les migrations puis lance les tests.
+    # Sinon, elle exécute les migrations, peuple la BDD puis lance le serveur.
     command: >
       sh -c "python laboratoire_bj/manage.py makemigrations &&
       python laboratoire_bj/manage.py migrate &&
@@ -35,9 +38,6 @@ services:
       - POSTGRES_DB=mydatabase
       - POSTGRES_USER=myuser
       - POSTGRES_PASSWORD=mypassword
-    depends_on:
-      db:
-        condition: service_healthy
 
 volumes:
   pgdata:
