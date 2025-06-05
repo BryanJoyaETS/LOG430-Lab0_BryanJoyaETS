@@ -25,30 +25,30 @@ jobs:
         run: pylint --fail-under=9 myapp
 
   test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Install Docker Compose
-        run: |
-          sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-          sudo chmod +x /usr/local/bin/docker-compose
+    - name: Install Docker Compose
+      run: |
+        sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        sudo chmod +x /usr/local/bin/docker-compose
 
-      - name: Build and start containers
-        run: docker-compose up -d
+    - name: Build services
+      run: docker-compose build
 
-      - name: Run makemigrations
-        run: docker-compose exec web python laboratoire_bj/manage.py makemigrations
+    - name: Run makemigrations
+      run: docker-compose run web python laboratoire_bj/manage.py makemigrations
 
-      - name: Run migrate
-        run: docker-compose exec web python laboratoire_bj/manage.py migrate
+    - name: Run migrate
+      run: docker-compose run web python laboratoire_bj/manage.py migrate
 
-      - name: Run Django tests via Docker Compose
-        run: docker-compose exec web python laboratoire_bj/manage.py test myapp
+    - name: Run Django tests via Docker Compose
+      run: docker-compose run web python laboratoire_bj/manage.py test myapp
 
-      - name: Stop containers
-        run: docker-compose down
+    - name: Stop containers
+      run: docker-compose down
 
   build-and-push:
     runs-on: ubuntu-latest
