@@ -38,8 +38,9 @@ jobs:
       - name: Build services
         run: docker-compose build
 
-      - name: Start containers
-        run: docker-compose up -d
+      # Démarrer uniquement le conteneur DB pour éviter de lancer le service web par défaut
+      - name: Start DB container
+        run: docker-compose up -d db
 
       - name: Wait for DB to be healthy
         run: |
@@ -49,7 +50,7 @@ jobs:
           done
 
       - name: Run migrations and tests
-        run: docker-compose run web sh -c "python laboratoire_bj/manage.py migrate && python laboratoire_bj/manage.py test myapp --keepdb"
+        run: docker-compose run web sh -c "python laboratoire_bj/manage.py migrate && python laboratoire_bj/manage.py test myapp"
 
       - name: Stop containers
         run: docker-compose down
