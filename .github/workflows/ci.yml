@@ -25,7 +25,7 @@ jobs:
         run: pylint --fail-under=9 myapp
 
   test:
-    runs-on: ubuntu-latestMore actions
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
