@@ -37,10 +37,6 @@ jobs:
           sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
           sudo chmod +x /usr/local/bin/docker-compose
 
-      - name: drop db
-        run: |
-          docker-compose down -v
-
       - name: Build services
         run: docker-compose build
 
@@ -54,11 +50,14 @@ jobs:
             sleep 3
           done
 
-      - name: Run tests (migrations + tests)
-        run: docker-compose run web
+      - name: Drop existing test database
+        run: docker-compose exec db sh -c "psql -U myuser -d postgres -c 'DROP DATABASE IF EXISTS test_mydatabase;'"
 
-      - name: Stop containers
-        run: docker-compose down
+      - name: Run migrations and tests
+        run: docker-compose run --rm web sh -c "python laboratoire_bj/manage.py migrate && python laboratoire_bj/manage.py test myapp"
+
+      - name: Stop containers (and remove volumes)
+        run: docker-compose down -v
 
   build-and-push:
     runs-on: ubuntu-latest
