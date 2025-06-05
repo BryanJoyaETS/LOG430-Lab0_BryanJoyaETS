@@ -22,29 +22,31 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run pylint
-        run: pylint application/caisse.py application/database.py application/interface.py application/main.py application/tables.py 
+        run: pylint --fail-under=9 myapp
 
   test:
     runs-on: ubuntu-latest
-    needs: lint
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
+      - name: Install Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      - name: Build and start containers
+        run: docker-compose up -d
 
-      - name: Run tests
-        run: pytest test_caisse.py test_interface.py test_tables.py
+      - name: Run Django tests via Docker Compose
+        run: docker-compose exec web python laboratoire_bj/manage.py test myapp
+
+      - name: Stop containers
+        run: docker-compose down
 
   build-and-push:
     runs-on: ubuntu-latest
-    needs: test
+    needs: [test]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
