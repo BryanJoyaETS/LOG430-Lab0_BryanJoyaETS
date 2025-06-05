@@ -1,27 +1,103 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Traiter un retour – {{ magasin.nom }}</title>
-    <style>
-        /* Vos styles ici */
-    </style>
+  <meta charset="UTF-8">
+  <title>Traiter un retour – {{ magasin.nom }}</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f7f9fc;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      font-size: 24px;
+      color: #007BFF;
+      margin-bottom: 24px;
+    }
+
+    form {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 8px;
+      margin-bottom: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+    input[type="submit"] {
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #0056b3;
+    }
+
+    
+    p {
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    
+    a.back {
+      display: inline-block;
+      margin-top: 20px;
+      text-decoration: none;
+      color: #007BFF;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+
+    a.back:hover {
+      text-decoration: underline;
+      color: #0056b3;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Traiter un retour pour le magasin {{ magasin.nom }}</h1>
-        <form method="POST" action="">
-            {% csrf_token %}
-            <label for="vente_id">ID de la vente à annuler :</label>
-            <input type="text" name="vente_id" id="vente_id">
-            <input type="submit" value="Traiter le retour">
-        </form>
-        {% if message %}
-            <p>{{ message }}</p>
-        {% endif %}
-        <p><a href="{% url 'menu_caisse' magasin.id %}" class="back">
-      ← Retour au menu de la caisse
-    </a></p>
-    </div>
+  <div class="container">
+    <h1>Traiter un retour pour le magasin {{ magasin.nom }}</h1>
+    <form method="POST" action="">
+      {% csrf_token %}
+      <label for="vente_id">ID de la vente à annuler :</label>
+      <input type="text" name="vente_id" id="vente_id" required>
+      <input type="submit" value="Traiter le retour">
+    </form>
+    {% if message %}
+      <p>{{ message }}</p>
+    {% endif %}
+    <p><a href="{% url 'menu_caisse' magasin.id %}" class="back">← Retour au menu de la caisse</a></p>
+  </div>
 </body>
 </html>
