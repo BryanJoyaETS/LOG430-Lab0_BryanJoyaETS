@@ -1,80 +1,58 @@
-"""
-URL configuration for laboratoire_bj project.
+from django.contrib import admin
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from application_multi_magasins.api_views import (
+    DashboardAPIView,
+    DemandeReapproAPIView,
+    ProduitViewSet,
+    MagasinViewSet,
+    ReapproAPIView,
+    StockViewSet,
+    VenteViewSet,
+    LigneVenteViewSet,
+    DemandeReapproViewSet,
+    RapportVentesAPIView,
+    StockMagasinAPIView,
+)
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+from rest_framework import permissions
+from django.views.generic import TemplateView
 
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-from django.contrib import admin
-from django.urls import path
-from django.contrib import admin
-from django.urls import path
-from myapp.views import demande_reappro, demande_reappro_utilisateur, generer_rapport, interface_caisse, liste_produits, modifier_produit, recherche_produit, enregistrer_vente, tableau_bord, traiter_demande_reappro, traiter_retour, historique_transactions, afficher_magasins, stock_magasin
+router = DefaultRouter()
+router.register(r'produits', ProduitViewSet, basename='produit')
+router.register(r'magasins', MagasinViewSet, basename='magasin')
+router.register(r'stocks', StockViewSet, basename='stock')
+router.register(r'ventes', VenteViewSet, basename='vente')
+router.register(r'lignes', LigneVenteViewSet, basename='ligne')
+router.register(r'demandes', DemandeReapproViewSet, basename='demande')
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="API Gestion Magasins",
+        default_version="v1",
+        description="Documentation de l'API REST",
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', afficher_magasins, name='index'),
-    path('rapport/', generer_rapport, name='generer_rapport'),
-    path('dashboard/', tableau_bord, name='tableau_bord'),
-    path('demande-reappro/<int:stock_id>/', demande_reappro, name='demande_reappro'),
-    path('caisse/<int:magasin_id>/', interface_caisse, name='menu_caisse'),
-
-    # 1. Recherche de produit
-    path(
-      'caisse/<int:magasin_id>/recherche/',
-      recherche_produit,
-      name='recherche_produit'
-    ),
-
-    # 2. Enregistrer une vente
-    path(
-      'caisse/<int:magasin_id>/vente/',
-      enregistrer_vente,
-      name='enregistrer_vente'
-    ),
-
-    # 3. Traiter un retour
-    path(
-      'caisse/<int:magasin_id>/retour/',
-      traiter_retour,
-      name='traiter_retour'
-    ),
-
-    # 4. Consulter le stock (vous l’aviez déjà)
-    path(
-      'caisse/<int:magasin_id>/stock/',
-      stock_magasin,
-      name='stock_magasin'
-    ),
-
-    # 5. Historique des transactions
-    path(
-      'caisse/<int:magasin_id>/historique/',
-      historique_transactions,
-      name='historique_transactions'
-    ),
-
-    path(
-      "reappro/<int:stock_id>/",
-      demande_reappro, 
-      name="demande_reappro"
-    ),
-
-    path("demande_reappro/<int:stock_id>/", demande_reappro_utilisateur, name="demande_reappro_utilisateur"),
-    path("traiter_demande_reappro/", traiter_demande_reappro, name="traiter_demande_reappro"),
-    path("produit/<int:produit_id>/modifier/", modifier_produit, name="modifier_produit"),
-    path("produits/", liste_produits, name="liste_produits"),
     
+    path('api/rapport/', RapportVentesAPIView.as_view(), name='rapport_ventes'),
+    path('api/stock/<int:magasin_id>/', StockMagasinAPIView.as_view(), name='stock_magasin'),
+    path('api/dashboard/', DashboardAPIView.as_view(), name='dashboard'),
 
-
-
+    
+    path('api/reappro/<int:stock_id>/', ReapproAPIView.as_view(), name='reappro'),
+    path('api/demande_reappro_utilisateur/<int:stock_id>/', DemandeReapproAPIView.as_view(), name='demande_reappro_utilisateur'),
+   
+    
+    path('api/', include(router.urls)),
+    
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    
+    path('', TemplateView.as_view(template_name='index.html'), name='home'),
 ]

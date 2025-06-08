@@ -3,3 +3,6 @@ pytest
 sqlalchemy
 psycopg2-binary==2.9.6
 Django==4.2
+djangorestframework>=3.12.0
+drf-yasg
+django-cors-headers

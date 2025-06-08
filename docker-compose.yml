@@ -26,7 +26,7 @@ services:
       python laboratoire_bj/manage.py migrate &&
       python laboratoire_bj/manage.py populer &&
       if [ \"$RUN_TESTS\" = \"true\" ]; then
-         python laboratoire_bj/manage.py test myapp;
+         python laboratoire_bj/manage.py test application_multi_magasins;
       else
          python laboratoire_bj/manage.py runserver 0.0.0.0:5000;
       fi"

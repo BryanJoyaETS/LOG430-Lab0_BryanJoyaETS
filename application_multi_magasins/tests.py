@@ -1,5 +1,5 @@
 """
-Module des tests unitaires et d'intégration pour l'application myapp.
+Module des tests unitaires et d'intégration pour l'application application_multi_magasins.
 """
 
 # pylint: disable=no-member
@@ -254,7 +254,7 @@ class RechercheProduitViewTests(TestCase):
 
 class EnregistrerVenteViewTests(TestCase):
     """
-    Tests unitaires pour la vue 'enregistrer_vente' de l'application myapp.
+    Tests unitaires pour la vue 'enregistrer_vente' de l'application application_multi_magasins.
     """
 
     def setUp(self):
@@ -313,7 +313,7 @@ class EnregistrerVenteViewTests(TestCase):
 
 class TraiterRetourViewTests(TestCase):
     """
-    Tests unitaires pour la vue 'traiter_retour' de l'application myapp.
+    Tests unitaires pour la vue 'traiter_retour' de l'application application_multi_magasins.
     """
 
     def setUp(self):

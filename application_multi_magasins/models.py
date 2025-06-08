@@ -1,5 +1,5 @@
 """
-Module des modèles de l'application myapp.
+Module des modèles de l'application application_multi_magasins.
 """
 
 from django.db import models

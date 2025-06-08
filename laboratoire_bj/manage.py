@@ -4,7 +4,7 @@ import sys
 import os
 
 # Add the parent directory of the current directory (which resolves to 'app/')
-# to sys.path so that 'myapp' is importable.
+# to sys.path so that 'application_multi_magasins' is importable.
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 def main():

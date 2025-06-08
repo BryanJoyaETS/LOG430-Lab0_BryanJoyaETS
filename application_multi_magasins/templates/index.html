@@ -11,13 +11,11 @@
       margin: 0;
       padding: 40px 20px;
     }
-
     h1 {
       text-align: center;
       margin-bottom: 30px;
       font-size: 2em;
     }
-
     .container {
       display: flex;
       flex-wrap: wrap;
@@ -26,7 +24,6 @@
       max-width: 1200px;
       margin: 0 auto;
     }
-
     .magasin-card {
       background: #ffffff;
       border-radius: 8px;
@@ -42,13 +39,11 @@
       transform: translateY(-5px);
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
     }
-
     .actions {
       display: flex;
       gap: 10px;
       margin-top: 15px;
     }
-
     .button {
       flex: 1;
       text-align: center;
@@ -64,14 +59,12 @@
     .button:hover {
       background-color: #0056b3;
     }
-
     .caisse-button {
       background-color: #28a745;
     }
     .caisse-button:hover {
       background-color: #218838;
     }
-
     .report-section {
       text-align: center;
       margin-top: 50px;
@@ -85,46 +78,59 @@
     }
   </style>
 </head>
-
 <body>
   <h1>Laboratoire Application de Gestion de Magasins et Caisses</h1>
-  <div class="container">
-    {% for magasin in magasins %}
-      <div class="magasin-card">
-        <div>
-          <h2>{{ magasin.nom }}</h2>
-          <p><strong>Adresse :</strong> {{ magasin.adresse }}</p>
-        </div>
-        <div class="actions">
-          <a href="{% url 'stock_magasin' magasin.id %}" class="button">
-            Voir le stock
-          </a>
-          {% if magasin.nom != "CENTRE_LOGISTIQUE" %}
-            <a href="{% url 'menu_caisse' magasin.id %}" class="button caisse-button">
-              Ouvrir une caisse
-            </a>
-          {% endif %}
-        </div>
-      </div>
-    {% empty %}
-      <p>Aucun magasin disponible.</p>
-    {% endfor %}
+
+  <!-- Conteneur où les magasins seront insérés -->
+  <div class="container" id="magasins-container">
+    <!-- Les magasins seront insérés ici dynamiquement -->
   </div>
 
   <div class="report-section">
-    <h2>Fonctions d'administration</h2>
-    <a href="{% url 'generer_rapport' %}" class="button">
-      Générer un rapport consolidé
-    </a>
-    <a href="{% url 'tableau_bord' %}" class="button">
-      Visualiser les performances
-    </a>
-    <a href="{% url 'traiter_demande_reappro' %}" class="button">
-      Gérer les demandes de réapprovisionnement
-    </a>
-    <a href="{% url 'liste_produits' %}" class="button">
-      Modifier la liste des produits
-    </a>
-  </div>
+  <h2>Fonctions d'administration</h2>
+  <a href="/swagger/" class="button" target="_blank">
+    Documentation API (Swagger)
+  </a>
+  <a href="/api/rapport/" class="button" target="_blank">
+    Générer un rapport consolidé
+  </a>
+  <a href="/api/rapport/" class="button" target="_blank">
+    Consulter le tableau de bord des ventes
+  </a>
+  <a href="/api/demandes/" class="button" target="_blank">
+    Gérer les demandes de réapprovisionnement
+  </a>
+  <a href="/api/produits/" class="button" target="_blank">
+    Modifier la liste des produits (API)
+  </a>
+</div>
+
+  <script>
+    fetch('/api/magasins/')
+      .then(response => response.json())
+      .then(data => {
+        const container = document.getElementById('magasins-container');
+        data.forEach(magasin => {
+          const card = document.createElement('div');
+          card.classList.add('magasin-card');
+          card.innerHTML = `
+            <div>
+              <h2>${magasin.nom}</h2>
+              <p><strong>Adresse :</strong> ${magasin.adresse}</p>
+            </div>
+            <div class="actions">
+              <a href="/api/stock/${magasin.id}" class="button">
+                Voir le stock
+              </a>
+              ${magasin.nom !== "CENTRE_LOGISTIQUE" ? `<a href="/caisse/${magasin.id}/" class="button caisse-button">
+                Ouvrir une caisse
+              </a>` : ''}
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      })
+      .catch(error => console.error("Erreur lors de la récupération :", error));
+  </script>
 </body>
 </html>

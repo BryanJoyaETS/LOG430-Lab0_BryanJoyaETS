@@ -6,7 +6,7 @@ package "laboratoire_bj (Django Project)" {
         [wsgi.py]
         [asgi.py]
     }
-    package "myapp" {
+    package "application_multi_magasins" {
         [models.py]
         [views.py]
         [admin.py]
@@ -36,11 +36,11 @@ package "Infrastructure" {
     [requirements.txt]
 }
 
-[laboratoire_bj] ..> [myapp] : "INSTALLED_APPS"
-[myapp] ..> [templates] : "Rendu HTML"
-[myapp] ..> [management] : "Commandes personnalisées"
-[myapp] ..> [migrations] : "Gestion schéma BDD"
-[myapp] ..> [tests.py] : "Tests unitaires"
+[laboratoire_bj] ..> [application_multi_magasins] : "INSTALLED_APPS"
+[application_multi_magasins] ..> [templates] : "Rendu HTML"
+[application_multi_magasins] ..> [management] : "Commandes personnalisées"
+[application_multi_magasins] ..> [migrations] : "Gestion schéma BDD"
+[application_multi_magasins] ..> [tests.py] : "Tests unitaires"
 [Infrastructure] ..> [laboratoire_bj] : "Déploiement & dépendances"
 
 @enduml

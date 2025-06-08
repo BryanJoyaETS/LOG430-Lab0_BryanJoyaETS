@@ -4,7 +4,7 @@ allowmixing
 
 node "Serveur Docker Host" {
     node "Container : web (Django)" as web {
-        RECTANGLE "Application Django\n(laboratoire_bj, myapp)" as django
+        RECTANGLE "Application Django\n(laboratoire_bj, application_multi_magasins)" as django
     }
     node "Container : db (PostgreSQL)" as db {
         RECTANGLE "PostgreSQL 15" as postgres

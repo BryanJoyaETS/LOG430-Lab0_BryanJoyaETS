@@ -1,5 +1,5 @@
 """
-Module de vues de l'application myapp.
+Module de vues de l'application application_multi_magasins.
 """
 # pylint: disable=no-member
 import datetime
@@ -12,15 +12,15 @@ from django.db.models import F, ExpressionWrapper, DecimalField, Sum
 from django.shortcuts import get_object_or_404, render, redirect
 from django.utils import timezone
 
+from application_multi_magasins.business.magasin_service import get_paginated_magasins
+
 from .models import DemandeReappro, Magasin, Produit, Stock, Vente, LigneVente
 
 def afficher_magasins(request):
     """UC0 – Page d’accueil : liste paginée des magasins."""
-    magasins_list = Magasin.objects.all()
-    paginator = Paginator(magasins_list, 10)
-    page_number = request.GET.get('page')
-    magasins = paginator.get_page(page_number)
+    magasins = get_paginated_magasins(request)
     return render(request, 'index.html', {'magasins': magasins})
+
 
 def interface_caisse(request, magasin_id):
     """UC2 – Menu de la caisse pour un magasin donné."""

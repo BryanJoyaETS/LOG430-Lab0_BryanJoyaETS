@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Réappro – </title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #87CEFA, #4682B4);
+      color: #333;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .card {
+      background: #fff;
+      width: 360px;
+      border-radius: 10px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      padding: 30px;
+      text-align: center;
+      animation: fadeIn 0.8s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h1 {
+      color: #0052cc;
+      font-size: 28px;
+      margin-bottom: 15px;
+    }
+    .info {
+      font-size: 16px;
+      margin: 8px 0;
+    }
+    input[type="number"] {
+      width: 100%;
+      padding: 12px;
+      margin: 15px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 18px;
+      transition: border-color 0.3s;
+    }
+    input[type="number"]:focus {
+      border-color: #0052cc;
+      outline: none;
+    }
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 4px;
+      background: #28a745;
+      color: #fff;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .btn:hover {
+      background: #218838;
+    }
+    a {
+      display: block;
+      margin-top: 20px;
+      color: #0052cc;
+      font-size: 16px;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    a:hover {
+      color: #003d99;
+      text-decoration: underline;
+    }
+    ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    ul li {
+      margin: 5px 0;
+      font-size: 16px;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1 id="reappro-title">Réappro – </h1>
+    <p class="info">Magasin : <strong id="info-magasin"></strong></p>
+    <p class="info">Stock local actuel : <strong id="stock-local"></strong></p>
+    <p class="info">Stock central disponible : <strong id="stock-central"></strong></p>
+    
+    <form id="reappro-form">
+      <input type="number" id="quantite-input" name="quantite" min="1" placeholder="Quantité à ajouter">
+      <button type="submit" class="btn">Valider la demande</button>
+    </form>
+    
+    <a id="back-link" href="#">← Retour au stock</a>
+    
+    <ul id="error-messages"></ul>
+  </div>
+
+  <script>
+    const pathParts = window.location.pathname.split('/').filter(part => part);
+    const stockId = pathParts[pathParts.length - 1];
+
+    fetch(`/api/reappro/${stockId}/?format=json`)
+      .then(response => response.json())
+      .then(data => {
+         document.getElementById('reappro-title').textContent = `Réappro – ${data.produit.nom}`;
+         document.getElementById('info-magasin').textContent = data.magasin.nom;
+         document.getElementById('stock-local').textContent = data.stock_local;
+         document.getElementById('stock-central').textContent = data.stock_central;
+         document.title = `Réappro – ${data.produit.nom} – ${data.magasin.nom}`;
+         document.getElementById('back-link').href = `/stock/${data.magasin.id}/`;
+      })
+      .catch(error => {
+         console.error('Erreur lors du chargement des données de réappro:', error);
+      });
+
+    document.getElementById('reappro-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const errorsElem = document.getElementById('error-messages');
+      errorsElem.innerHTML = "";
+      
+      const quantite = document.getElementById('quantite-input').value;
+      if (!quantite || quantite < 1) {
+          const li = document.createElement('li');
+          li.textContent = "Veuillez entrer une quantité valide.";
+          errorsElem.appendChild(li);
+          return;
+      }
+      
+      fetch(`/api/demande_reappro_utilisateur/${stockId}/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ quantite: quantite })
+      })
+      .then(response => {
+         if (response.ok) {
+           return response.json();
+         } else {
+           return response.json().then(errData => { throw errData; });
+         }
+      })
+      .then(data => {
+         alert("Demande de réapprovisionnement soumise avec succès !");
+         window.location.href = `/stock/${data.magasin_id}/`;
+      })
+      .catch(error => {
+         if (error) {
+           for (const key in error) {
+             const li = document.createElement('li');
+             li.textContent = `${key} : ${error[key]}`;
+             errorsElem.appendChild(li);
+           }
+         } else {
+           const li = document.createElement('li');
+           li.textContent = "Erreur lors de la soumission de la demande.";
+           errorsElem.appendChild(li);
+         }
+      });
+    });
+  </script>
+</body>
+</html>

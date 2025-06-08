@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Stock</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        .stock-card {
+            background: white;
+            padding: 15px;
+            width: 300px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            text-align: left;
+        }
+        .back-button,
+        .reappro-button {
+            display: inline-block;
+            color: white;
+            padding: 8px 12px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background 0.3s ease;
+            margin-top: 10px;
+        }
+        .back-button {
+            background-color: #007BFF;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+        .reappro-button {
+            background-color: #28a745;
+        }
+        .reappro-button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="title">Stock du magasin : </h1>
+    <div class="container" id="stocks-container">
+    </div>
+    <br>
+    <a href="/" class="back-button">Retour à la liste des magasins</a>
+        
+    <script>
+      const pathParts = window.location.pathname.split('/');
+      const magasinId = pathParts[3];
+
+      fetch(`/api/stock/${magasinId}/?format=json`)
+        .then(response => response.json())
+        .then(data => {
+          const titre = `Stock du magasin : ${data.magasin.nom}`;
+          document.getElementById('title').textContent = titre;
+          document.title = `Stock - ${data.magasin.nom}`;
+
+          const container = document.getElementById('stocks-container');
+          if (data.stocks && data.stocks.length > 0) {
+              data.stocks.forEach(stock => {
+                  const card = document.createElement('div');
+                  card.classList.add('stock-card');
+                  card.innerHTML = `
+                        <h2>${stock.produit.nom}</h2>
+                        <p><strong>Quantité disponible :</strong> ${stock.quantite}</p>
+                        ${data.magasin.nom !== "CENTRE_LOGISTIQUE" ?
+                          `<a href="/demande_reappro/${stock.id}/" class="reappro-button">Demande de réapprovisionnement</a>` 
+                          : ''}
+                  `;
+                  container.appendChild(card);
+              });
+          } else {
+              container.innerHTML = "<p>Aucun produit en stock pour ce magasin.</p>";
+          }
+        })
+        .catch(error => console.error('Erreur lors du chargement du stock:', error));
+    </script>
+</body>
+</html>

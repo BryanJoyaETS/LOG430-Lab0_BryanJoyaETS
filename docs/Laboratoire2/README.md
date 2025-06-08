@@ -81,7 +81,7 @@ Architecture MVC typique de Django :
 
 Structure des dossiers :
 
-- `myapp/` : application Django principale (models, views, templates, tests)
+- `application_multi_magasins/` : application Django principale (models, views, templates, tests)
 - `templates/` : HTML pour chaque fonctionnalité
 - `docker-compose.yml` et `Dockerfile` : déploiement
 - `tests.py` : tests unitaires des cas critiques
