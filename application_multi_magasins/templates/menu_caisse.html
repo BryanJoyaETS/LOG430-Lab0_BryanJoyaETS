@@ -58,13 +58,13 @@
     <li><a href="{% url 'traiter_retour' magasin.id %}">
       3. Traiter un retour
     </a></li>
-    <li><a href="{% url 'stock_magasin' magasin.id %}">
-      4. Consulter le stock
+    <li><a href="/api/stock/{{ magasin.id }}/">
+        4. Consulter le stock
     </a></li>
     <li><a href="{% url 'historique_transactions' magasin.id %}">
       5. Consulter l'historique des transactions
     </a></li>
-    <li><a href="{% url 'index' %}" class="back-button">Retour à la liste des magasins</a></li>
+    <a href="/" class="back-button">Retour à l'accueil</a>
   </ul>
 </body>
 </html>

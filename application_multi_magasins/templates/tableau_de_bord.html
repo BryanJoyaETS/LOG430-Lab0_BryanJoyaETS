@@ -144,7 +144,7 @@
           data.tendances.forEach(item => {
             const row = document.createElement('tr');
             row.innerHTML = `<td>${item.magasin__nom}</td>
-                             <td>${item.total_ventes}</td>`;
+                             <td>${item.total_quantite}</td>`;
             tableTendances.appendChild(row);
           });
         })

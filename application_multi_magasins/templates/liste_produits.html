@@ -1,69 +1,74 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Liste des Produits</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            padding: 20px;
-        }
-        .container {
-            max-width: 800px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        .produit {
-            border-bottom: 1px solid #eee;
-            padding: 10px 0;
-        }
-        .produit:last-child {
-            border-bottom: none;
-        }
-        .produit a {
-            text-decoration: none;
-            color: #007BFF;
-        }
-        .produit a:hover {
-            text-decoration: underline;
-        }
-        
-        .back-button {
-            display: inline-block;
-            background-color: #007BFF;
-            color: white;
-            padding: 10px 15px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            margin-top: 20px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Liste des Produits</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    li {
+      border-bottom: 1px solid #ddd;
+      padding: 10px;
+    }
+    li a {
+      color: #007BFF;
+      text-decoration: none;
+      font-weight: bold;
+      margin-left: 20px;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Liste des Produits</h1>
-        {% if produits %}
-            {% for produit in produits %}
-                <div class="produit">
-                    <h2>{{ produit.nom }}</h2>
-                    <p><strong>Catégorie :</strong> {{ produit.categorie|default:"Non définie" }}</p>
-                    <p><strong>Prix :</strong> {{ produit.prix }} €</p>
-                    <a href="{% url 'modifier_produit' produit.id %}">Modifier ce produit</a>
-                </div>
-            {% endfor %}
-        {% else %}
-            <p>Aucun produit trouvé.</p>
-        {% endif %}
+  <div class="container">
+    <h1>Liste des Produits</h1>
+    <div id="produits-container">
+      <p>Chargement des produits…</p>
     </div>
-    <a href="{% url 'index' %}" class="back-button">Retour à l'accueil</a>
+  </div>
+  
+  <script>
+    // Appel de l'API pour récupérer la liste des produits
+    fetch('/api/produit/list?format=json')
+      .then(response => response.json())
+      .then(data => {
+         let html = '';
+         if (data.length === 0) {
+            html = '<p>Aucun produit trouvé.</p>';
+         } else {
+            html = '<ul>';
+            data.forEach(produit => {
+              html += `<li>
+                          <strong>${produit.nom}</strong>
+                          (${produit.categorie ? produit.categorie : 'Sans catégorie'})
+                          - ${produit.prix} €
+                          <a href="/api/produit/${produit.id}/modifier/?format=html">Modifier</a>
+                       </li>`;
+            });
+            html += '</ul>';
+         }
+         document.getElementById("produits-container").innerHTML = html;
+      })
+      .catch(error => {
+         console.error("Erreur lors du chargement des produits :", error);
+         document.getElementById("produits-container").innerHTML = '<p>Erreur lors du chargement des produits.</p>';
+      });
+  </script>
 </body>
 </html>

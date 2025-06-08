@@ -29,8 +29,13 @@ class StockSerializer(serializers.ModelSerializer):
     class Meta:
         model = Stock
         fields = '__all__'
+        depth = 1
 
 class DemandeReapproSerializer(serializers.ModelSerializer):
+    magasin = MagasinSerializer(read_only=True)
+    produit = ProduitSerializer(read_only=True)
+
     class Meta:
         model = DemandeReappro
         fields = '__all__'
+        
