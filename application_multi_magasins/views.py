@@ -2,25 +2,17 @@
 Module de vues de l'application application_multi_magasins.
 """
 # pylint: disable=no-member
-import datetime
-from decimal import Decimal, InvalidOperation
-
-from django.contrib import messages
-from django.core.paginator import Paginator
 from django.db import DatabaseError,transaction
-from django.db.models import F, ExpressionWrapper, DecimalField, Sum
 from django.shortcuts import get_object_or_404, render, redirect
-from django.utils import timezone
 
 from application_multi_magasins.business.magasin_service import get_paginated_magasins
 
-from .models import DemandeReappro, Magasin, Produit, Stock, Vente, LigneVente
+from .models import Magasin, Stock, Vente, LigneVente
 
 def afficher_magasins(request):
     """UC0 – Page d’accueil : liste paginée des magasins."""
     magasins = get_paginated_magasins(request)
     return render(request, 'index.html', {'magasins': magasins})
-
 
 def interface_caisse(request, magasin_id):
     """UC2 – Menu de la caisse pour un magasin donné."""
@@ -168,16 +160,6 @@ def traiter_retour(request, magasin_id):
 
     return render(request, "retour.html", {"magasin": magasin, "message": message})
 
-def stock_magasin(request, magasin_id):
-    """UC2.4 – Consulter le stock d’un magasin (pour la caisse)."""
-    magasin = get_object_or_404(Magasin, id=magasin_id)
-    stocks = Stock.objects.filter(magasin=magasin)
-    return render(request, 'stock_magasin.html', {
-        'magasin': magasin,
-        'stocks': stocks
-    })
-
-
 def historique_transactions(request, magasin_id):
     """UC2.5 – Historique des transactions d’un magasin."""
     magasin = get_object_or_404(Magasin, id=magasin_id)
@@ -190,282 +172,20 @@ def historique_transactions(request, magasin_id):
         'ventes': ventes
     })
 
-def generer_rapport(request):
-    """UC1 – Rapport consolidé des ventes (maison mère)."""
-    centre = get_object_or_404(Magasin, nom='CENTRE_LOGISTIQUE')
-
-    # Calcul du chiffre d'affaires par magasin (hors centre logistique)
-    ventes_par_magasin = (
-        Vente.objects.exclude(magasin=centre)
-        .values('magasin__nom')
-        .annotate(
-            chiffre_affaires=Sum(
-            ExpressionWrapper(
-                F('lignes__quantite') * F('lignes__prix_unitaire'),
-                output_field=DecimalField()
-                )
-            )
-        )
-        .order_by('magasin__nom')
-    )
-
-    # Top 5 des produits les plus vendus
-    produits_populaires = (
-        LigneVente.objects
-        .values('produit__nom')
-        .annotate(total_vendu=Sum('quantite'))
-        .order_by('-total_vendu')[:5]
-    )
-
-    # Stock restant par magasin et produit (hors centre logistique)
-    stock_restant = (
-        Stock.objects.exclude(magasin=centre)
-        .values('magasin__nom', 'produit__nom', 'quantite')
-        .order_by('magasin__nom')
-    )
-
-    return render(request, 'rapport_de_ventes.html', {
-        'ventes_par_magasin': ventes_par_magasin,
-        'produits_populaires': produits_populaires,
-        'stock_restant': stock_restant
-    })
 
 
-def tableau_bord(request):
-    """UC3 – Tableau de bord synthétique (maison mère)."""
-    centre = get_object_or_404(Magasin, nom='CENTRE_LOGISTIQUE')
-
-    # Chiffre d'affaires par magasin
-    chiffre_affaires = (
-        Vente.objects.exclude(magasin=centre)
-                     .order_by('magasin__nom')
-                     .values('magasin__nom')
-                     .annotate(
-                         total=Sum(
-                             ExpressionWrapper(
-                                 F('lignes__quantite') * F('lignes__prix_unitaire'),
-                                 output_field=DecimalField()
-                             )
-                         )
-                    )
-    )
-
-    # Produits en rupture de stock (<= 5)
-    ruptures_stock = (
-        Stock.objects.exclude(magasin=centre)
-        .filter(quantite__lte=5)
-        .values('magasin__nom', 'produit__nom', 'quantite')
-    )
-
-    # Produits en surstock (>= 100)
-    surstock = (
-        Stock.objects.exclude(magasin=centre)
-        .filter(quantite__gte=100)
-        .values('magasin__nom', 'produit__nom', 'quantite')
-    )
-
-    # Tendances de la semaine dernière
-    semaine_derniere = timezone.now() - datetime.timedelta(days=7)
-    tendances = (
-        Vente.objects.exclude(magasin=centre)
-        .filter(date__gte=semaine_derniere)
-        .values('magasin__nom')
-        .annotate(total_ventes=Sum('lignes__quantite'))
-    )
-
-    return render(request, 'tableau_de_bord.html', {
-        'chiffre_affaires': chiffre_affaires,
-        'ruptures_stock': ruptures_stock,
-        'surstock': surstock,
-        'tendances': tendances
-    })
-
-def demande_reappro(request, stock_id):
-    """
-    Permet le réapprovisionnement d'un produit pour un magasin donné en transférant du stock
-    depuis le centre logistique (une instance de Magasin) vers le magasin de l'employé.
-    """
-    stock_local = get_object_or_404(Stock, id=stock_id)
-    magasin_local = stock_local.magasin
-    produit = stock_local.produit
-
-    magasin_central = get_object_or_404(Magasin, nom='CENTRE_LOGISTIQUE')
-    stock_central = get_object_or_404(Stock, magasin=magasin_central, produit=produit)
-
-    if request.method == "POST":
-        qte_str = request.POST.get("quantite", "").strip()
-        try:
-            quantite = int(qte_str)
-        except ValueError:
-            messages.error(request, "Veuillez entrer une quantité valide.")
-            return redirect("demande_reappro", stock_id=stock_id)
-
-        if quantite <= 0:
-            messages.error(request, "La quantité doit être supérieure à zéro.")
-            return redirect("demande_reappro", stock_id=stock_id)
-
-        if quantite > stock_central.quantite:
-            messages.error(request, "Stock central insuffisant pour ce produit.")
-            return redirect("demande_reappro", stock_id=stock_id)
-
-        with transaction.atomic():
-            stock_central.quantite -= quantite
-            stock_central.save()
-            stock_local.quantite += quantite
-            stock_local.save()
-
-        messages.success(
-            request,
-            (
-                f"Réapprovisionnement réussi : +{quantite} unité(s) de {produit.nom} "
-                f"ajoutées à {magasin_local.nom}."
-            )
-        )
-        return redirect("stock_magasin", magasin_id=magasin_local.id)
-
-    context = {
-        "magasin": magasin_local,
-        "produit": produit,
-        "stock_local": stock_local.quantite,
-        "stock_central": stock_central.quantite,
-    }
-    return render(request, "demande_reappro.html", context)
 
 
-def demande_reappro_utilisateur(request, stock_id):
-    """
-    Interface pour l'employé d’un magasin :
-    - Affiche le stock local et le stock central (du centre logistique).
-    - Permet de saisir une quantité pour créer une demande de réapprovisionnement.
-    """
-    stock_local = get_object_or_404(Stock, id=stock_id)
-    magasin_local = stock_local.magasin
-    produit = stock_local.produit
-
-    magasin_central = get_object_or_404(Magasin, nom='CENTRE_LOGISTIQUE')
-    stock_central = get_object_or_404(Stock, magasin=magasin_central, produit=produit)
-
-    if request.method == "POST":
-        qte_str = request.POST.get("quantite", "").strip()
-        try:
-            quantite = int(qte_str)
-        except ValueError:
-            messages.error(request, "Veuillez entrer une quantité valide.")
-            return redirect("demande_reappro_utilisateur", stock_id=stock_id)
-
-        if quantite <= 0:
-            messages.error(request, "La quantité doit être supérieure à zéro.")
-            return redirect("demande_reappro_utilisateur", stock_id=stock_id)
-
-        DemandeReappro.objects.create(
-            magasin=magasin_local,
-            produit=produit,
-            quantite=quantite,
-            statut='pending'
-        )
-        messages.success(request, "Demande de réapprovisionnement envoyée.")
-        return redirect("stock_magasin", magasin_id=magasin_local.id)
-
-    context = {
-        "magasin": magasin_local,
-        "produit": produit,
-        "stock_local": stock_local.quantite,
-        "stock_central": stock_central.quantite,
-    }
-    return render(request, "demande_reappro_utilisateur.html", context)
 
 
-def traiter_demande_reappro(request):
-    """
-    Interface du responsable logistique pour traiter les demandes de réapprovisionnement.
-    Le responsable peut approuver une demande (si le stock central est suffisant)
-    ou la refuser. En cas d'approbation, le stock central est décrémenté et le stock
-    du magasin demandeur incrémenté, le tout dans une transaction atomique.
-    """
-    demandes = DemandeReappro.objects.filter(statut='pending').select_related('magasin', 'produit')
-
-    if request.method == "POST":
-        demande_id = request.POST.get("demande_id")
-        action = request.POST.get("action")
-        demande = get_object_or_404(DemandeReappro, id=demande_id, statut='pending')
-
-        centre = get_object_or_404(Magasin, nom="CENTRE_LOGISTIQUE")
-        stock_centre = get_object_or_404(Stock, magasin=centre, produit=demande.produit)
-
-        if action == "approve":
-            if stock_centre.quantite < demande.quantite:
-                messages.error(request, "Stock central insuffisant pour approuver la demande.")
-                demande.statut = 'refused'
-            else:
-                with transaction.atomic():
-                    stock_centre.quantite -= demande.quantite
-                    stock_centre.save()
-                    stock_local, _ = Stock.objects.get_or_create(
-                        magasin=demande.magasin,
-                        produit=demande.produit,
-                        defaults={"quantite": 0}
-                    )
-                    stock_local.quantite += demande.quantite
-                    stock_local.save()
-                    demande.statut = 'approved'
-            demande.date_traitement = timezone.now()
-            demande.save()
-
-        elif action == "refuse":
-            demande.statut = 'refused'
-            demande.date_traitement = timezone.now()
-            demande.save()
-
-        return redirect("traiter_demande_reappro")
-
-    context = {"demandes": demandes}
-    return render(request, "traiter_demande_reappro.html", context)
 
 
-def modifier_produit(request, produit_id):
-    """
-    Permet au responsable de modifier un produit sans utiliser de Django Form.
-    Les nouvelles valeurs sont extraites de request.POST puis appliquées à l'instance Produit.
-    """
-    produit = get_object_or_404(Produit, id=produit_id)
-
-    if request.method == "POST":
-        nom = request.POST.get("nom", "").strip()
-        categorie = request.POST.get("categorie", "").strip()
-        prix_str = request.POST.get("prix", "").strip()
-
-        if not nom:
-            messages.error(request, "Le nom du produit est requis.")
-            return redirect("modifier_produit", produit_id=produit_id)
-
-        try:
-            prix = Decimal(prix_str)
-        except (InvalidOperation, TypeError):
-            messages.error(request, "Veuillez entrer un prix valide.")
-            return redirect("modifier_produit", produit_id=produit_id)
-
-        produit.nom = nom
-        produit.categorie = categorie
-        produit.prix = prix
-        produit.save()
-
-        messages.success(
-            request,
-            (
-                "Produit mis à jour avec succès - "
-                "les modifications sont synchronisées dans tous les magasins."
-            )
-        )
-        return redirect("liste_produits")
-
-    context = {"product": produit}
-    return render(request, "modifier_produit.html", context)
 
 
-def liste_produits(request):
-    """
-    Affiche la liste de tous les produits.
-    Cette vue récupère tous les objets Produit et les transmet au template.
-    """
-    produits = Produit.objects.all().order_by('nom')
-    return render(request, 'liste_produits.html', {'produits': produits})
+
+
+
+
+
+
+

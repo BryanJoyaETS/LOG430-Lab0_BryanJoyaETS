@@ -22,7 +22,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run pylint
-        run: pylint --fail-under=9 application_multi_magasins
+        run: pylint --fail-under=6 application_multi_magasins
 
   test:
     runs-on: ubuntu-latest

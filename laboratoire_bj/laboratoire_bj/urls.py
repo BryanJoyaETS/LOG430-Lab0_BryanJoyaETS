@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.shortcuts import render
 from django.urls import path, include
-from application_multi_magasins.views import enregistrer_vente, historique_transactions, interface_caisse, recherche_produit, stock_magasin, traiter_retour
+from application_multi_magasins.views import enregistrer_vente, historique_transactions, interface_caisse, recherche_produit, traiter_retour
 from rest_framework.routers import DefaultRouter
 from application_multi_magasins.api_views import (
     DashboardAPIView,
@@ -92,9 +92,7 @@ urlpatterns = [
     path('caisse/<int:magasin_id>/vente/',enregistrer_vente,name='enregistrer_vente'),
     # 3. Traiter un retour
     path('caisse/<int:magasin_id>/retour/',traiter_retour,name='traiter_retour'),
-    # 4. Afficher le stock du magasin
-    path('caisse/<int:magasin_id>/stock/',stock_magasin,name='stock_magasin'),
-    # 5. Historique des transactions
+    # 4. Historique des transactions
     path('caisse/<int:magasin_id>/historique/',historique_transactions,name='historique_transactions'),
 
 ]
