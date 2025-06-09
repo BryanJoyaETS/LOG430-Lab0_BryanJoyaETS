@@ -1,6 +1,7 @@
 from django.core.paginator import Paginator
 from application_multi_magasins.models import Magasin
 
+"""Service pour gérer les opérations liées aux magasins."""
 def get_paginated_magasins(request, per_page=10):
     """
     Retourne la liste paginée des magasins.
