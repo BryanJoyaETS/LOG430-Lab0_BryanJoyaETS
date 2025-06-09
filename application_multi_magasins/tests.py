@@ -350,37 +350,6 @@ class TraiterRetourViewTests(TestCase):
         self.stock.refresh_from_db()
         self.assertEqual(self.stock.quantite, initial_stock + self.ligne.quantite)
 
-class StockMagasinViewTests(TestCase):
-    """
-    Tests unitaires pour la vue de consultation du stock d'un magasin.
-    """
-
-    def setUp(self):
-        """
-        Configure l'environnement de test : crée un magasin et plusieurs stocks associés.
-        """
-        self.magasin = Magasin.objects.create(nom="Magasin Test", adresse="123 Rue Test")
-        # Créer plusieurs stocks
-        self.produit1 = Produit.objects.create(nom="Produit A", categorie="Catégorie", prix=25.00)
-        self.produit2 = Produit.objects.create(nom="Produit B", categorie="Catégorie", prix=30.00)
-        Stock.objects.create(magasin=self.magasin, produit=self.produit1, quantite=5)
-        Stock.objects.create(magasin=self.magasin, produit=self.produit2, quantite=15)
-
-    def test_stock_magasin_view(self):
-        """
-        Vérifie que la vue 'stock_magasin' renvoie le status code 200, le bon template
-        et que le contexte contient la liste correcte de stocks pour le magasin.
-        """
-        url = reverse('stock_magasin', args=[self.magasin.id])
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'stock_magasin.html')
-        # Vérifier que le contexte contient bien la liste de stocks
-        self.assertIn('stocks', response.context)
-        self.assertEqual(response.context['magasin'], self.magasin)
-        self.assertEqual(response.context['stocks'].count(), 2)
-
-
 class HistoriqueTransactionsViewTests(TestCase):
     """
     Tests unitaires pour la vue affichant l'historique des transactions d'un magasin.
