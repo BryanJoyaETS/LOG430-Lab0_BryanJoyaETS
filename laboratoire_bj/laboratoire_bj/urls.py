@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.shortcuts import render
-from django.urls import path, include
+from django.urls import path, include, re_path
 from application_multi_magasins.views import enregistrer_vente, historique_transactions, interface_caisse, recherche_produit, traiter_retour
 from rest_framework.routers import DefaultRouter
 from application_multi_magasins.api_views import (
@@ -79,8 +79,10 @@ urlpatterns = [
     path('api/produit/list/', ListeProduitsAPIView.as_view(), name='liste_produits'),
     # Modifier un produit - UC4 - Modifier les informations d'un produit
     path('api/produit/<int:produit_id>/modifier/', ModifierProduitAPIView.as_view(), name='modifier_produit'),
-
-    # Documentation de l'API avec Swagger et ReDoc
+    ##---------------------------------------------------------------------------------------------------------------------------
+    re_path(r'^swagger(?P<format>\.json|\.yaml)$',
+            schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    # Documentation de l'API avec Swagger et ReDoc -----------------------------------------------------------------------------
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     ##---------------------------------------------------------------------------------------------------------------------------
