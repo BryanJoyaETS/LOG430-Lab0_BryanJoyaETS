@@ -43,7 +43,7 @@ jobs:
 
       - name: Wait for DB to be healthy
         run: |
-          until [ "$(docker inspect --format='{{.State.Health.Status}}' my-postgres)" = "healthy" ]; do
+          until [ "$(docker inspect --format='{{.State.Health.Status}}' my-postgres-3)" = "healthy" ]; do
             echo "Waiting for PostgreSQL to be healthy..."
             sleep 3
           done
