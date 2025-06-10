@@ -363,5 +363,5 @@ class ModifierProduitAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         if request.accepted_renderer.format == 'html':
             context = {'produit': produit, 'errors': serializer.errors}
-            return Response(context, template_name=self.template_name)
+            return Response(context, template_name=self.template_name, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

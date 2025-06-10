@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from .models import Magasin, Produit, Vente, LigneVente, Stock, DemandeReappro
+from ..models import Magasin, Produit, Vente, LigneVente, Stock, DemandeReappro
 
 class MagasinModelTests(TestCase):
     """
