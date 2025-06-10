@@ -28,11 +28,11 @@ services:
       if [ \"$RUN_TESTS\" = \"true\" ]; then
          python laboratoire_bj/manage.py test application_multi_magasins;
       else
-         python laboratoire_bj/manage.py runserver 0.0.0.0:5000;
+         python laboratoire_bj/manage.py runserver 0.0.0.0:8000;
       fi"
     container_name: lab0-container-bryanjoya
     ports:
-      - "5000:5000"
+      - "8000:8000"
     environment:
       - POSTGRES_HOST=db
       - POSTGRES_DB=mydatabase

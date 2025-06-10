@@ -11,4 +11,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copier le code de l’application
 COPY . .
 
-CMD ["python", "laboratoire_bj/manage.py", "runserver", "0.0.0.0:5000"]
+CMD ["python", "laboratoire_bj/manage.py", "runserver", "0.0.0.0:8000"]
