@@ -30,7 +30,7 @@ services:
       else
          python laboratoire_bj/manage.py runserver 0.0.0.0:8000;
       fi"
-    container_name: lab0-container-bryanjoya
+    container_name: lab3-container-bryanjoya
     ports:
       - "8000:8000"
     environment:
