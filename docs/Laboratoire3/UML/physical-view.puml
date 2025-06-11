@@ -1,0 +1,21 @@
+@startuml
+actor "Utilisateur" as user
+
+node "Navigateur Web" as browser
+
+cloud "Docker Host" {
+    node "Container Web\nlab3-container-bryanjoya\n(Django)" as web {
+        component "application_multi_magasins" as app
+        component "laboratoire_bj" as project
+    }
+    node "Container DB\nmy-postgres-3\n(PostgreSQL 15)" as db
+}
+
+database "Volume Docker\npgdata-3" as volume
+
+user --> browser : HTTP/HTTPS
+browser --> web : Requêtes HTTP (Port 8000)
+web --> db : Connexion SQL (Port 5432)
+db --> volume : Stockage persistant
+
+@enduml

@@ -1,0 +1,35 @@
+@startuml
+left to right direction
+actor "Utilisateur" as Utilisateur
+actor "Administrateur" as Admin
+
+rectangle "Application Multi-Magasins" {
+    (Consulter la liste des magasins) as UC1
+    (Ouvrir une caisse) as UC2
+    (Rechercher un produit) as UC3
+    (Enregistrer une vente) as UC4
+    (Traiter un retour) as UC5
+    (Consulter le stock) as UC6
+    (Demander un réapprovisionnement) as UC7
+    (Gérer les demandes de réapprovisionnement) as UC8
+    (Consulter l'historique des transactions) as UC9
+    (Modifier un produit) as UC10
+    (Consulter le tableau de bord) as UC11
+    (Générer un rapport consolidé) as UC12
+
+    Utilisateur --> UC1
+    Utilisateur --> UC2
+    Utilisateur --> UC3
+    Utilisateur --> UC4
+    Utilisateur --> UC5
+    Utilisateur --> UC6
+    Utilisateur --> UC7
+    Utilisateur --> UC9
+
+    Admin --> UC8
+    Admin --> UC10
+    Admin --> UC11
+    Admin --> UC12
+}
+
+@enduml

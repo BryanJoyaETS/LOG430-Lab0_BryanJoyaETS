@@ -1,0 +1,38 @@
+@startuml
+' Vue de processus : interactions et exécution des principaux processus
+
+actor Utilisateur
+actor Administrateur
+
+node "Navigateur Web" as browser
+
+node "Web (Django)" as web {
+    [manage.py]
+    [views.py]
+    [api_views.py]
+    [business/magasin_service.py]
+}
+
+node "PostgreSQL DB" as db
+
+cloud "Docker" {
+    node "Container web" as c_web
+    node "Container db" as c_db
+}
+
+Utilisateur --> browser : Navigue, effectue des actions
+Administrateur --> browser : Accède à l'admin, API, rapports
+
+browser --> c_web : Requêtes HTTP (UI, API REST)
+c_web --> web : Appelle views/api_views
+web --> db : Requêtes SQL (ORM)
+c_web --> c_db : Connexion PostgreSQL
+
+' Processus de CI/CD
+database "Docker Hub" as dockerhub
+cloud "GitHub Actions" as gha
+
+gha --> c_web : Build & Test (docker-compose)
+c_web --> dockerhub : Push image
+
+@enduml

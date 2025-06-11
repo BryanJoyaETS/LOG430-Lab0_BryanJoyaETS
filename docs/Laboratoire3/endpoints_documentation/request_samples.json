@@ -1,0 +1,86 @@
+[
+    {
+        "magasin": {
+            "nom": "string",
+            "adresse": "string"
+        },
+        "produit": {
+            "nom": "string",
+            "categorie": "string",
+            "prix": "string"
+        },
+        "quantite": 2147483647,
+        "statut": "pending",
+        "date_traitement": "2019-08-24T14:15:22Z"
+    },
+
+
+    {
+        "magasin": {
+            "nom": "string",
+            "adresse": "string"
+        },
+        "produit": {
+            "nom": "string",
+            "categorie": "string",
+            "prix": "string"
+        },
+        "quantite": 2147483647,
+        "statut": "pending",
+        "date_traitement": "2019-08-24T14:15:22Z"
+    },
+
+
+    {
+        "magasin": {
+            "nom": "string",
+            "adresse": "string"
+        },
+        "produit": {
+            "nom": "string",
+            "categorie": "string",
+            "prix": "string"
+        },
+        "quantite": 2147483647,
+        "statut": "pending",
+        "date_traitement": "2019-08-24T14:15:22Z"
+    },
+
+
+    {
+        "quantite": -2147483648,
+        "prix_unitaire": "string",
+        "vente": 0,
+        "produit": 0
+    },
+
+
+    {
+        "quantite": -2147483648,
+        "prix_unitaire": "string",
+        "vente": 0,
+        "produit": 0
+    },
+
+
+    {
+        "est_retournee": true,
+        "magasin": 0
+    },
+
+    
+    {
+        "magasin": {
+            "nom": "string",
+            "adresse": "string"
+        },
+        "produit": {
+            "nom": "string",
+            "categorie": "string",
+            "prix": "string"
+        },
+        "quantite": 2147483647,
+        "statut": "pending",
+        "date_traitement": "2019-08-24T14:15:22Z"
+    }
+]

@@ -1,0 +1,74 @@
+@startuml
+
+    package "application_multi_magasins" {
+        [__init__.py]
+        [admin.py]
+        [api_views.py]
+        [apps.py]
+        [models.py]
+        [serializers.py]
+        [views.py]
+        
+        package "business" {
+            [__init__.py]
+            [magasin_service.py]
+        }
+        
+        package "management" {
+            [__init__.py]
+            package "commands" {
+                [__init__.py]
+                [populer.py]
+            }
+        }
+        
+        package "migrations" {
+            [__init__.py]
+        }
+        
+        package "templates" {
+            [demande_reappro.html]
+            [historique.html]
+            [index.html]
+            [liste_produits.html]
+            [menu_caisse.html]
+            [modifier_produit.html]
+            [rapport_de_ventes.html]
+            [recherche.html]
+            [retour.html]
+            [stock.html]
+            [stock_magasin.html]
+            [tableau_de_bord.html]
+            [traiter_demande_reappro.html]
+            [vente.html]
+        }
+        
+        package "tests" {
+            [__init__.py]
+            [test_dashboard_api.py]
+            [test_demande_reappro_action_api.py]
+            [test_demande_reappro_api.py]
+            [test_liste_produits_api.py]
+            [test_modifier_produit_api.py]
+            [test_rapport_ventes_api.py]
+            [test_reappro_api.py]
+            [test_stock_magasin.py]
+            [test_traitement_demande_reappro_api.py]
+            [tests.py]
+            [tests_api.py]
+        }
+    }
+    
+    package "laboratoire_bj" {
+        [manage.py]
+        package "laboratoire_bj" {
+            [__init__.py]
+            [asgi.py]
+            [settings.py]
+            [urls.py]
+            [wsgi.py]
+        }
+    }
+
+
+@enduml

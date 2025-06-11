@@ -1,22 +1,22 @@
 # LOG430-Lab0_BryanJoyaETS
 
-## Laboratoire 2 — Évolution d'une architecture logicielle plus scalable et flexible
+## Laboratoire 3 — Exposition d'une API RESTful pour un système multi-magasins
 
 > **Note :** Le fichier de documentation principal se trouve dans  
-> [`docs/Laboratoire2/README.md`](docs/Laboratoire2/README.md)
+> [`docs/Laboratoire3/README.md`](docs/Laboratoire3/README.md)
 
 ---
 
 ## Exécution du projet
 
 ```bash
-docker compose build --no-cache
-docker compose up -d db
-RUN_TESTS=false docker compose up
+docker compose -p lab3 build --no-cache
+docker compose -p lab3 up -d db
+RUN_TESTS=false docker compose -p lab3 up
 ```
 
 Une fois l'application démarrée, se rendre à l'adresse :  
-[http://10.194.32.198:5000](http://10.194.32.198:5000)
+[http://10.194.32.198:8000](http://10.194.32.198:8000)
 
 ---
 
@@ -28,4 +28,6 @@ Une fois l'application démarrée, se rendre à l'adresse :
   `git clone` https://github.com/BryanJoyaETS/LOG430-Lab0_BryanJoyaETS/releases/tag/Lab1
 - **Laboratoire 2 :**  
   `git clone` https://github.com/BryanJoyaETS/LOG430-Lab0_BryanJoyaETS/releases/tag/Lab2
+- **Laboratoire 3 :**  
+  `git clone` https://github.com/BryanJoyaETS/LOG430-Lab0_BryanJoyaETS/releases/tag/Lab3
 ---

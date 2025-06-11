@@ -1,0 +1,1303 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "API Gestion Magasins",
+    "description": "Documentation de l'API REST",
+    "version": "v1"
+  },
+  "host": "10.194.32.198:8000",
+  "schemes": [
+    "http"
+  ],
+  "basePath": "/api",
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "securityDefinitions": {
+    "Basic": {
+      "type": "basic"
+    }
+  },
+  "security": [
+    {
+      "Basic": []
+    }
+  ],
+  "paths": {
+    "/dashboard/": {
+      "get": {
+        "operationId": "dashboard_list",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "dashboard"
+        ]
+      },
+      "parameters": []
+    },
+    "/demande/list/": {
+      "get": {
+        "operationId": "demande_list_list",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "demande"
+        ]
+      },
+      "post": {
+        "operationId": "demande_list_create",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "demande"
+        ]
+      },
+      "parameters": []
+    },
+    "/demande_reappro_utilisateur/{stock_id}/": {
+      "post": {
+        "operationId": "demande_reappro_utilisateur_create",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "demande_reappro_utilisateur"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "stock_id",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    "/demandes/": {
+      "get": {
+        "operationId": "demandes_list",
+        "description": "ViewSet pour le modèle DemandeReappro.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DemandeReappro"
+              }
+            }
+          }
+        },
+        "tags": [
+          "demandes"
+        ]
+      },
+      "post": {
+        "operationId": "demandes_create",
+        "description": "ViewSet pour le modèle DemandeReappro.",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DemandeReappro"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/DemandeReappro"
+            }
+          }
+        },
+        "tags": [
+          "demandes"
+        ]
+      },
+      "parameters": []
+    },
+    "/demandes/{demande_id}/action/": {
+      "post": {
+        "operationId": "demandes_action_create",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "demandes"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "demande_id",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    "/demandes/{id}/": {
+      "get": {
+        "operationId": "demandes_read",
+        "description": "ViewSet pour le modèle DemandeReappro.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/DemandeReappro"
+            }
+          }
+        },
+        "tags": [
+          "demandes"
+        ]
+      },
+      "put": {
+        "operationId": "demandes_update",
+        "description": "ViewSet pour le modèle DemandeReappro.",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DemandeReappro"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/DemandeReappro"
+            }
+          }
+        },
+        "tags": [
+          "demandes"
+        ]
+      },
+      "patch": {
+        "operationId": "demandes_partial_update",
+        "description": "ViewSet pour le modèle DemandeReappro.",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DemandeReappro"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/DemandeReappro"
+            }
+          }
+        },
+        "tags": [
+          "demandes"
+        ]
+      },
+      "delete": {
+        "operationId": "demandes_delete",
+        "description": "ViewSet pour le modèle DemandeReappro.",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "demandes"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "A unique integer value identifying this demande reappro.",
+          "required": true,
+          "type": "integer"
+        }
+      ]
+    },
+    "/lignes/": {
+      "get": {
+        "operationId": "lignes_list",
+        "description": "ViewSet pour le modèle LigneVente.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/LigneVente"
+              }
+            }
+          }
+        },
+        "tags": [
+          "lignes"
+        ]
+      },
+      "post": {
+        "operationId": "lignes_create",
+        "description": "ViewSet pour le modèle LigneVente.",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LigneVente"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/LigneVente"
+            }
+          }
+        },
+        "tags": [
+          "lignes"
+        ]
+      },
+      "parameters": []
+    },
+    "/lignes/{id}/": {
+      "get": {
+        "operationId": "lignes_read",
+        "description": "ViewSet pour le modèle LigneVente.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/LigneVente"
+            }
+          }
+        },
+        "tags": [
+          "lignes"
+        ]
+      },
+      "put": {
+        "operationId": "lignes_update",
+        "description": "ViewSet pour le modèle LigneVente.",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LigneVente"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/LigneVente"
+            }
+          }
+        },
+        "tags": [
+          "lignes"
+        ]
+      },
+      "patch": {
+        "operationId": "lignes_partial_update",
+        "description": "ViewSet pour le modèle LigneVente.",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LigneVente"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/LigneVente"
+            }
+          }
+        },
+        "tags": [
+          "lignes"
+        ]
+      },
+      "delete": {
+        "operationId": "lignes_delete",
+        "description": "ViewSet pour le modèle LigneVente.",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "lignes"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "A unique integer value identifying this ligne vente.",
+          "required": true,
+          "type": "integer"
+        }
+      ]
+    },
+    "/magasins/": {
+      "get": {
+        "operationId": "magasins_list",
+        "description": "ViewSet pour le modèle Magasin.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Magasin"
+              }
+            }
+          }
+        },
+        "tags": [
+          "magasins"
+        ]
+      },
+      "post": {
+        "operationId": "magasins_create",
+        "description": "ViewSet pour le modèle Magasin.",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Magasin"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Magasin"
+            }
+          }
+        },
+        "tags": [
+          "magasins"
+        ]
+      },
+      "parameters": []
+    },
+    "/magasins/{id}/": {
+      "get": {
+        "operationId": "magasins_read",
+        "description": "ViewSet pour le modèle Magasin.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Magasin"
+            }
+          }
+        },
+        "tags": [
+          "magasins"
+        ]
+      },
+      "put": {
+        "operationId": "magasins_update",
+        "description": "ViewSet pour le modèle Magasin.",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Magasin"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Magasin"
+            }
+          }
+        },
+        "tags": [
+          "magasins"
+        ]
+      },
+      "patch": {
+        "operationId": "magasins_partial_update",
+        "description": "ViewSet pour le modèle Magasin.",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Magasin"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Magasin"
+            }
+          }
+        },
+        "tags": [
+          "magasins"
+        ]
+      },
+      "delete": {
+        "operationId": "magasins_delete",
+        "description": "ViewSet pour le modèle Magasin.",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "magasins"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "A unique integer value identifying this magasin.",
+          "required": true,
+          "type": "integer"
+        }
+      ]
+    },
+    "/produit/list/": {
+      "get": {
+        "operationId": "produit_list_list",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "produit"
+        ]
+      },
+      "parameters": []
+    },
+    "/produit/{produit_id}/modifier/": {
+      "get": {
+        "operationId": "produit_modifier_list",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "produit"
+        ]
+      },
+      "put": {
+        "operationId": "produit_modifier_update",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "produit"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "produit_id",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    "/produits/": {
+      "get": {
+        "operationId": "produits_list",
+        "description": "ViewSet pour le modèle Produit.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Produit"
+              }
+            }
+          }
+        },
+        "tags": [
+          "produits"
+        ]
+      },
+      "post": {
+        "operationId": "produits_create",
+        "description": "ViewSet pour le modèle Produit.",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Produit"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Produit"
+            }
+          }
+        },
+        "tags": [
+          "produits"
+        ]
+      },
+      "parameters": []
+    },
+    "/produits/{id}/": {
+      "get": {
+        "operationId": "produits_read",
+        "description": "ViewSet pour le modèle Produit.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Produit"
+            }
+          }
+        },
+        "tags": [
+          "produits"
+        ]
+      },
+      "put": {
+        "operationId": "produits_update",
+        "description": "ViewSet pour le modèle Produit.",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Produit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Produit"
+            }
+          }
+        },
+        "tags": [
+          "produits"
+        ]
+      },
+      "patch": {
+        "operationId": "produits_partial_update",
+        "description": "ViewSet pour le modèle Produit.",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Produit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Produit"
+            }
+          }
+        },
+        "tags": [
+          "produits"
+        ]
+      },
+      "delete": {
+        "operationId": "produits_delete",
+        "description": "ViewSet pour le modèle Produit.",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "produits"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "A unique integer value identifying this produit.",
+          "required": true,
+          "type": "integer"
+        }
+      ]
+    },
+    "/rapport/": {
+      "get": {
+        "operationId": "rapport_list",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "rapport"
+        ]
+      },
+      "parameters": []
+    },
+    "/reappro/{stock_id}/": {
+      "get": {
+        "operationId": "reappro_read",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "reappro"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "stock_id",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    "/stock/{magasin_id}/": {
+      "get": {
+        "operationId": "stock_read",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "stock"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "magasin_id",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    "/stocks/": {
+      "get": {
+        "operationId": "stocks_list",
+        "description": "ViewSet pour le modèle Stock.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Stock"
+              }
+            }
+          }
+        },
+        "tags": [
+          "stocks"
+        ]
+      },
+      "post": {
+        "operationId": "stocks_create",
+        "description": "ViewSet pour le modèle Stock.",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Stock"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Stock"
+            }
+          }
+        },
+        "tags": [
+          "stocks"
+        ]
+      },
+      "parameters": []
+    },
+    "/stocks/{id}/": {
+      "get": {
+        "operationId": "stocks_read",
+        "description": "ViewSet pour le modèle Stock.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Stock"
+            }
+          }
+        },
+        "tags": [
+          "stocks"
+        ]
+      },
+      "put": {
+        "operationId": "stocks_update",
+        "description": "ViewSet pour le modèle Stock.",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Stock"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Stock"
+            }
+          }
+        },
+        "tags": [
+          "stocks"
+        ]
+      },
+      "patch": {
+        "operationId": "stocks_partial_update",
+        "description": "ViewSet pour le modèle Stock.",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Stock"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Stock"
+            }
+          }
+        },
+        "tags": [
+          "stocks"
+        ]
+      },
+      "delete": {
+        "operationId": "stocks_delete",
+        "description": "ViewSet pour le modèle Stock.",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "stocks"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "A unique integer value identifying this stock.",
+          "required": true,
+          "type": "integer"
+        }
+      ]
+    },
+    "/ventes/": {
+      "get": {
+        "operationId": "ventes_list",
+        "description": "ViewSet pour le modèle Vente.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Vente"
+              }
+            }
+          }
+        },
+        "tags": [
+          "ventes"
+        ]
+      },
+      "post": {
+        "operationId": "ventes_create",
+        "description": "ViewSet pour le modèle Vente.",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Vente"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Vente"
+            }
+          }
+        },
+        "tags": [
+          "ventes"
+        ]
+      },
+      "parameters": []
+    },
+    "/ventes/{id}/": {
+      "get": {
+        "operationId": "ventes_read",
+        "description": "ViewSet pour le modèle Vente.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Vente"
+            }
+          }
+        },
+        "tags": [
+          "ventes"
+        ]
+      },
+      "put": {
+        "operationId": "ventes_update",
+        "description": "ViewSet pour le modèle Vente.",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Vente"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Vente"
+            }
+          }
+        },
+        "tags": [
+          "ventes"
+        ]
+      },
+      "patch": {
+        "operationId": "ventes_partial_update",
+        "description": "ViewSet pour le modèle Vente.",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Vente"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Vente"
+            }
+          }
+        },
+        "tags": [
+          "ventes"
+        ]
+      },
+      "delete": {
+        "operationId": "ventes_delete",
+        "description": "ViewSet pour le modèle Vente.",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "ventes"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "A unique integer value identifying this vente.",
+          "required": true,
+          "type": "integer"
+        }
+      ]
+    }
+  },
+  "definitions": {
+    "Magasin": {
+      "required": [
+        "nom",
+        "adresse"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "title": "ID",
+          "type": "integer",
+          "readOnly": true
+        },
+        "nom": {
+          "title": "Nom",
+          "type": "string",
+          "maxLength": 255,
+          "minLength": 1
+        },
+        "adresse": {
+          "title": "Adresse",
+          "type": "string",
+          "maxLength": 255,
+          "minLength": 1
+        }
+      }
+    },
+    "Produit": {
+      "required": [
+        "nom",
+        "prix"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "title": "ID",
+          "type": "integer",
+          "readOnly": true
+        },
+        "nom": {
+          "title": "Nom",
+          "type": "string",
+          "maxLength": 255,
+          "minLength": 1
+        },
+        "categorie": {
+          "title": "Categorie",
+          "type": "string",
+          "maxLength": 255,
+          "x-nullable": true
+        },
+        "prix": {
+          "title": "Prix",
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    },
+    "DemandeReappro": {
+      "required": [
+        "quantite"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "title": "ID",
+          "type": "integer",
+          "readOnly": true
+        },
+        "magasin": {
+          "$ref": "#/definitions/Magasin"
+        },
+        "produit": {
+          "$ref": "#/definitions/Produit"
+        },
+        "quantite": {
+          "title": "Quantite",
+          "type": "integer",
+          "maximum": 2147483647,
+          "minimum": 0
+        },
+        "statut": {
+          "title": "Statut",
+          "type": "string",
+          "enum": [
+            "pending",
+            "approved",
+            "refused"
+          ]
+        },
+        "date_demande": {
+          "title": "Date demande",
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "date_traitement": {
+          "title": "Date traitement",
+          "type": "string",
+          "format": "date-time",
+          "x-nullable": true
+        }
+      }
+    },
+    "LigneVente": {
+      "required": [
+        "quantite",
+        "prix_unitaire",
+        "vente",
+        "produit"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "title": "ID",
+          "type": "integer",
+          "readOnly": true
+        },
+        "quantite": {
+          "title": "Quantite",
+          "type": "integer",
+          "maximum": 2147483647,
+          "minimum": -2147483648
+        },
+        "prix_unitaire": {
+          "title": "Prix unitaire",
+          "type": "string",
+          "format": "decimal"
+        },
+        "vente": {
+          "title": "Vente",
+          "type": "integer"
+        },
+        "produit": {
+          "title": "Produit",
+          "type": "integer"
+        }
+      }
+    },
+    "Stock": {
+      "required": [
+        "quantite"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "title": "ID",
+          "type": "integer",
+          "readOnly": true
+        },
+        "quantite": {
+          "title": "Quantite",
+          "type": "integer",
+          "maximum": 2147483647,
+          "minimum": -2147483648
+        },
+        "produit": {
+          "required": [
+            "nom",
+            "prix"
+          ],
+          "type": "object",
+          "properties": {
+            "id": {
+              "title": "ID",
+              "type": "integer",
+              "readOnly": true
+            },
+            "nom": {
+              "title": "Nom",
+              "type": "string",
+              "maxLength": 255,
+              "minLength": 1
+            },
+            "categorie": {
+              "title": "Categorie",
+              "type": "string",
+              "maxLength": 255,
+              "x-nullable": true
+            },
+            "prix": {
+              "title": "Prix",
+              "type": "string",
+              "format": "decimal"
+            }
+          },
+          "readOnly": true
+        },
+        "magasin": {
+          "required": [
+            "nom",
+            "adresse"
+          ],
+          "type": "object",
+          "properties": {
+            "id": {
+              "title": "ID",
+              "type": "integer",
+              "readOnly": true
+            },
+            "nom": {
+              "title": "Nom",
+              "type": "string",
+              "maxLength": 255,
+              "minLength": 1
+            },
+            "adresse": {
+              "title": "Adresse",
+              "type": "string",
+              "maxLength": 255,
+              "minLength": 1
+            }
+          },
+          "readOnly": true
+        }
+      }
+    },
+    "Vente": {
+      "required": [
+        "magasin"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "title": "ID",
+          "type": "integer",
+          "readOnly": true
+        },
+        "date": {
+          "title": "Date",
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "est_retournee": {
+          "title": "Est retournee",
+          "type": "boolean"
+        },
+        "magasin": {
+          "title": "Magasin",
+          "type": "integer"
+        }
+      }
+    }
+  }
+}

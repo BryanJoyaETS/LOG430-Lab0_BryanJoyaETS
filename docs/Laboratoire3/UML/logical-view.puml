@@ -1,0 +1,49 @@
+@startuml
+class Magasin {
+    +id: int
+    +nom: str
+    +adresse: str
+}
+
+class Produit {
+    +id: int
+    +nom: str
+    +categorie: str
+    +prix: decimal
+}
+
+class Stock {
+    +id: int
+    +quantite: int
+}
+
+class Vente {
+    +id: int
+    +date: datetime
+    +est_retournee: bool
+}
+
+class LigneVente {
+    +id: int
+    +quantite: int
+    +prix_unitaire: decimal
+}
+
+class DemandeReappro {
+    +id: int
+    +quantite: int
+    +statut: str
+    +date_demande: datetime
+}
+
+' Relations
+Magasin "1" -- "0..*" Stock : possède >
+Produit "1" -- "0..*" Stock : stocké dans >
+Magasin "1" -- "0..*" Vente : réalise >
+Vente "1" -- "1..*" LigneVente : contient >
+Produit "1" -- "0..*" LigneVente : vendu dans >
+Stock "1" -- "0..*" DemandeReappro : sujet de >
+Magasin "1" -- "0..*" DemandeReappro : demande >
+Produit "1" -- "0..*" DemandeReappro : concerne >
+
+@enduml
