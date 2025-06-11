@@ -2,6 +2,8 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from application_multi_magasins.models import Magasin, Produit, DemandeReappro
 
+#pylint:disable=no-member
+
 class TraitementDemandeReapproAPIViewTest(APITestCase):
     def setUp(self):
         self.magasin = Magasin.objects.create(nom="Store1", adresse="123 Rue Store1")

@@ -1,8 +1,8 @@
-# tests/test_api.py
-
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
+
+#pylint:disable=no-member
 
 from application_multi_magasins.models import (
     Produit, Magasin, Stock, Vente, LigneVente, DemandeReappro

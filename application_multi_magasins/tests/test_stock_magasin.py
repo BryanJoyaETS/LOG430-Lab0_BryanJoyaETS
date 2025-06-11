@@ -3,6 +3,8 @@ from rest_framework.test import APITestCase
 from application_multi_magasins.models import Magasin, Produit, Stock
 from application_multi_magasins.serializers import MagasinSerializer, StockSerializer
 
+#pylint:disable=no-member
+
 class StockMagasinAPIViewTest(APITestCase):
     def setUp(self):
         self.central = Magasin.objects.create(nom="CENTRE_LOGISTIQUE", adresse="Center Address")

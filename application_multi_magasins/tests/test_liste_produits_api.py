@@ -3,6 +3,8 @@ from rest_framework.test import APITestCase
 from application_multi_magasins.models import Produit
 from application_multi_magasins.serializers import ProduitSerializer
 
+#pylint:disable=no-member
+
 class ListeProduitsAPIViewTest(APITestCase):
     def setUp(self):
         Produit.objects.create(nom="Apple", categorie="Fruit", prix="1.00")

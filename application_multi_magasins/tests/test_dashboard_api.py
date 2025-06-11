@@ -4,6 +4,8 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from application_multi_magasins.models import Magasin, Produit, Vente, LigneVente, Stock
 
+#pylint:disable=no-member
+
 class DashboardAPIViewTest(APITestCase):
     def setUp(self):
         self.centre = Magasin.objects.create(nom="CENTRE_LOGISTIQUE", adresse="Center Address")

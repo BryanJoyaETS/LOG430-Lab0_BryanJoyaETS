@@ -4,6 +4,8 @@ from rest_framework.test import APITestCase
 from application_multi_magasins.models import Produit
 from application_multi_magasins.serializers import ProduitSerializer
 
+#pylint:disable=no-member
+
 class ModifierProduitAPIViewTest(APITestCase):
     def setUp(self):
         self.produit = Produit.objects.create(
