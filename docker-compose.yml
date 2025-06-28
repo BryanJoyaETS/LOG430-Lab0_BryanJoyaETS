@@ -38,7 +38,32 @@ services:
       - POSTGRES_DB=mydatabase
       - POSTGRES_USER=myuser
       - POSTGRES_PASSWORD=mypassword
-    
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   container_name: prometheus
+  #   ports:
+  #     - "9090:9090"
+  #   volumes:
+  #     - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   container_name: grafana
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - GF_SECURITY_ADMIN_PASSWORD=secret
+  #   depends_on:
+  #     - prometheus
+  
+  k6:
+    image: loadimpact/k6:latest
+    volumes:
+      - ./k6:/scripts:ro
+    environment:
+      BASE_URL: "http://10.194.32.198:8000/api"
+    entrypoint: ["k6", "run", "/scripts/load-test.js"]
+
 
 volumes:
   pgdata-3:

@@ -24,6 +24,7 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
 from django.views.generic import TemplateView
+from django_prometheus import exports
 
 router = DefaultRouter()
 router.register(r'produits', ProduitViewSet, basename='produit')
@@ -96,5 +97,9 @@ urlpatterns = [
     path('caisse/<int:magasin_id>/retour/',traiter_retour,name='traiter_retour'),
     # 4. Historique des transactions
     path('caisse/<int:magasin_id>/historique/',historique_transactions,name='historique_transactions'),
+
+
+    ##-------------------------------------------metriques------------------------------------------------------------------------------
+    path("metrics/", exports.ExportToDjangoView),
 
 ]
