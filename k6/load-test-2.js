@@ -2,7 +2,7 @@ import http from "k6/http";
 import { check, sleep } from "k6";
 import encoding from "k6/encoding";
 
-const BASE = "http://10.194.32.198:8000/api";
+const BASE = __ENV.BASE_URL || "http://localhost:8000/api";
 const authHeader = `Basic ${encoding.b64encode(`username:password`)}`;
 const params = {
   headers: {

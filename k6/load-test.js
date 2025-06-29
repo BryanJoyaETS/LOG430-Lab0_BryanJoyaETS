@@ -15,7 +15,7 @@ export let options = {
 
 };
 
-const BASE = "http://10.194.32.198:8000/api";
+const BASE = __ENV.BASE_URL || "http://localhost:8000/api";
 const USER = "username";
 const PASS = "password";
 
