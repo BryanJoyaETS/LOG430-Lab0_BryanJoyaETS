@@ -29,6 +29,7 @@ ALLOWED_HOSTS = ['10.194.32.198', 'localhost', '127.0.0.1',
                  "lab3-web-1",
                  "lab3-web-2",
                  "lab3-web-3",
+                 "lab3-web-4",
                  ]
 
 

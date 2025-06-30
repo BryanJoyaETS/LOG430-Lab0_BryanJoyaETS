@@ -32,10 +32,21 @@ export let options = {
 };
 
 export default function () {
-  http.get(`${BASE}/stock/1/`, params);
-  http.get(`${BASE}/rapport/`, params);
-  http.put(`${BASE}/produit/1/modifier/?format=json`,
-           JSON.stringify({ nom: "Product1", categorie: "Category1", prix: "100.01" }),
-           params);
+  // Requête 1 - stock
+  let res1 = http.get(`${BASE}/stock/1/`, params);
+  console.log(`Stock served by: ${res1.headers["X-Served-By"] || "unknown"}`);
+  check(res1, { "stock 200": (r) => r.status === 200 });
+
+  // Requête 2 - rapport
+  let res2 = http.get(`${BASE}/rapport/`, params);
+  console.log(`Rapport served by: ${res2.headers["X-Served-By"] || "unknown"}`);
+  check(res2, { "rapport 200": (r) => r.status === 200 });
+
+  // Requête 3 - update produit
+  let payload = JSON.stringify({ nom: "Product1", categorie: "Category1", prix: "100.01" });
+  let res3 = http.put(`${BASE}/produit/1/modifier/?format=json`, payload, params);
+  console.log(`Update served by: ${res3.headers["X-Served-By"] || "unknown"}`);
+  check(res3, { "update 200": (r) => r.status === 200 });
+
   sleep(1);
 }
