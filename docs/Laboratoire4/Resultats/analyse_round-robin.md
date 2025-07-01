@@ -179,20 +179,6 @@ running (2m14.2s), 00/50 VUs, 120 complete and 9 interrupted iterations
 default ✓ [======================================] 00/50 VUs  2m0s
 
 
-
-| **Métrique**          | **2 instances** | **3 instances** |
-| --------------------- | --------------- | --------------- |
-| **Trafic total**      |                 |                 |
-| **Erreurs (nb)**      |                 |                 |
-| **Réponses**          |                 |                 |
-| **Latence P95 & P99** |                 |                 |
-| **CPU**               |                 |                 |
-| **Mémoire Django**    |                 |                 |
-
-
-
-
-
 ## Lancement du load-test-2.js : 
 
 ![alt text](<Capture d’écran 2025-06-29 221516.png>)
@@ -234,18 +220,6 @@ TOTAL RESULTS
 running (11m19.4s), 000/200 VUs, 719 complete and 124 interrupted iterations
 stress ✓ [======================================] 000/200 VUs  11m0s
 ERRO[0680] thresholds on metrics 'http_req_duration, http_req_failed' have been crossed 
-
-
-| **Métrique**          | **2 instances** | **3 instances** |
-| --------------------- | --------------- | --------------- |
-| **Trafic total**      |                 |                 |
-| **Erreurs (nb)**      |                 |                 |
-| **Réponses**          |                 |                 |
-| **Latence P95 & P99** |                 |                 |
-| **CPU**               |                 |                 |
-| **Mémoire Django**    |                 |                 |
-
-
   
 
 ## avec quatre instances du service API : 
@@ -302,20 +276,6 @@ THRESHOLDS
 running (2m15.1s), 00/50 VUs, 119 complete and 8 interrupted iterations
 default ✓ [======================================] 00/50 VUs  2m0s
 
-
-| **Métrique**          | **3 instances** | **4 instances** |
-| --------------------- | --------------- | --------------- |
-| **Trafic total**      |                 |                 |
-| **Erreurs (nb)**      |                 |                 |
-| **Réponses**          |                 |                 |
-| **Latence P95 & P99** |                 |                 |
-| **CPU**               |                 |                 |
-| **Mémoire Django**    |                 |                 |
-
-
-
-
-
 ## Lancement du load-test-2.js : 
 
 
@@ -368,19 +328,6 @@ THRESHOLDS
 running (11m25.3s), 000/200 VUs, 666 complete and 154 interrupted iterations
 stress ✓ [======================================] 000/200 VUs  11m0s
 ERRO[0687] thresholds on metrics 'http_req_duration, http_req_failed' have been crossed 
-
-| **Métrique**          | **3 instances** | **4 instances** |
-| --------------------- | --------------- | --------------- |
-| **Trafic total**      |                 |                 |
-| **Erreurs (nb)**      |                 |                 |
-| **Réponses**          |                 |                 |
-| **Latence P95 & P99** |                 |                 |
-| **CPU**               |                 |                 |
-| **Mémoire Django**    |                 |                 |
-
-
-
-
 
 
 ## config nginx utilisée 

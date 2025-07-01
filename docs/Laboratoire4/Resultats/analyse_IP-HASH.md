@@ -111,20 +111,6 @@ stress ✓ [======================================] 000/200 VUs  11m0s
 ERRO[0684] thresholds on metrics 'http_req_duration, http_req_failed' have been crossed 
 
 
-| **Métrique**          | **3 instances** | **4 instances** |
-| --------------------- | --------------- | --------------- |
-| **Trafic total**      |                 |                 |
-| **Erreurs (nb)**      |                 |                 |
-| **Réponses**          |                 |                 |
-| **Latence P95 & P99** |                 |                 |
-| **CPU**               |                 |                 |
-| **Mémoire Django**    |                 |                 |
-
-
-
-
-
-
 ## config nginx utilisée 
 
 worker_processes auto;

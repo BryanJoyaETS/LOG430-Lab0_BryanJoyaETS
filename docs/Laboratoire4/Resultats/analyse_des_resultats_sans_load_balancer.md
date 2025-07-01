@@ -69,16 +69,16 @@ execution: local
 running (2m13.5s), 00/50 VUs, 123 complete and 8 interrupted iterations
 default ✓ [======================================] 00/50 VUs  2m0s
 
-![alt text](<Capture d’écran 2025-06-28 162822.png>)
+![alt text](<captures/Capture d’écran 2025-06-28 162822.png>)
 
 
 
 ## Lancement du constant-load-test.js : 
 
-![alt text](<Capture d’écran 2025-06-28 173413.png>)
+![alt text](<captures/Capture d’écran 2025-06-28 173413.png>)
 
 apres 
-![alt text](<Capture d’écran 2025-06-28 173856.png>)
+![alt text](<captures/Capture d’écran 2025-06-28 173856.png>)
 
 execution: local
         script: k6/constant-load-test.js
@@ -135,14 +135,14 @@ ERRO[0309] thresholds on metrics 'http_req_duration' have been crossed
 
 5 minutes dans l'endurance
 
-![alt text](<Capture d’écran 2025-06-28 174512.png>)
+![alt text](<captures/Capture d’écran 2025-06-28 174512.png>)
 
 11 minutes : 
-![alt text](<Capture d’écran 2025-06-28 175133.png>)
+![alt text](<captures/Capture d’écran 2025-06-28 175133.png>)
 
 23 minutes 
 
-![alt text](<Capture d’écran 2025-06-28 180326.png>)
+![alt text](<captures/Capture d’écran 2025-06-28 180326.png>)
 
  execution: local
         script: k6/soak-test.js
@@ -231,12 +231,12 @@ ERRO[1808] thresholds on metrics 'http_req_duration' have been crossed
 
 5.5 minutes dans le test 
 
-![alt text](<Capture d’écran 2025-06-28 182707.png>)
+![alt text](<captures/Capture d’écran 2025-06-28 182707.png>)
 
 
 vers la fin 
 
-![alt text](<Capture d’écran 2025-06-28 183113.png>)
+![alt text](<captures/Capture d’écran 2025-06-28 183113.png>)
 
 
 THRESHOLDS 

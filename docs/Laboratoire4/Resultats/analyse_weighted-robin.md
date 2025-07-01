@@ -50,18 +50,6 @@ running (2m14.2s), 00/50 VUs, 119 complete and 9 interrupted iterations
 default ✓ [======================================] 00/50 VUs  2m0s
 ERRO[0135] thresholds on metrics 'http_req_duration' have been crossed 
 
-| **Métrique**          | **3 instances** | **4 instances** |
-| --------------------- | --------------- | --------------- |
-| **Trafic total**      |                 |                 |
-| **Erreurs (nb)**      |                 |                 |
-| **Réponses**          |                 |                 |
-| **Latence P95 & P99** |                 |                 |
-| **CPU**               |                 |                 |
-| **Mémoire Django**    |                 |                 |
-
-
-
-
 
 ## Lancement du load-test-2.js : 
 
@@ -112,20 +100,6 @@ ERRO[0135] thresholds on metrics 'http_req_duration' have been crossed
 running (11m19.9s), 000/200 VUs, 727 complete and 121 interrupted iterations
 stress ✓ [======================================] 000/200 VUs  11m0s
 ERRO[0680] thresholds on metrics 'http_req_duration, http_req_failed' have been crossed 
-
-
-| **Métrique**          | **3 instances** | **4 instances** |
-| --------------------- | --------------- | --------------- |
-| **Trafic total**      |                 |                 |
-| **Erreurs (nb)**      |                 |                 |
-| **Réponses**          |                 |                 |
-| **Latence P95 & P99** |                 |                 |
-| **CPU**               |                 |                 |
-| **Mémoire Django**    |                 |                 |
-
-
-
-
 
 
 ## config nginx utilisée 

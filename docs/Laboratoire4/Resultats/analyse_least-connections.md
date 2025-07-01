@@ -48,19 +48,6 @@ running (2m13.2s), 00/50 VUs, 118 complete and 9 interrupted iterations
 default ✓ [======================================] 00/50 VUs  2m0s
 
 
-| **Métrique**          | **3 instances** | **4 instances** |
-| --------------------- | --------------- | --------------- |
-| **Trafic total**      |                 |                 |
-| **Erreurs (nb)**      |                 |                 |
-| **Réponses**          |                 |                 |
-| **Latence P95 & P99** |                 |                 |
-| **CPU**               |                 |                 |
-| **Mémoire Django**    |                 |                 |
-
-
-
-
-
 ## Lancement du load-test-2.js : 
 
 ![alt text](<Capture d’écran 2025-06-29 233323.png>)
@@ -109,19 +96,6 @@ THRESHOLDS
 
 running (11m28.8s), 000/200 VUs, 629 complete and 156 interrupted iterations
 stress ✓ [======================================] 000/200 VUs  11m0s
-
-| **Métrique**          | **3 instances** | **4 instances** |
-| --------------------- | --------------- | --------------- |
-| **Trafic total**      |                 |                 |
-| **Erreurs (nb)**      |                 |                 |
-| **Réponses**          |                 |                 |
-| **Latence P95 & P99** |                 |                 |
-| **CPU**               |                 |                 |
-| **Mémoire Django**    |                 |                 |
-
-
-
-
 
 
 ## config nginx utilisée 
