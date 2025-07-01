@@ -80,7 +80,15 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - web
-      
+  
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    expose:
+      - "6379"
+
 
 volumes:
   pgdata-3:

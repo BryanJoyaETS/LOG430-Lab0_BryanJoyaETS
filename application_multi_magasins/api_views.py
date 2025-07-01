@@ -7,6 +7,10 @@ en suivant les conventions RESTful.
 """
 # pylint: disable=no-member, import-error, too-few-public-methods
 from datetime import timedelta
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 from django.contrib import messages
 from django.db.models import Sum, F, ExpressionWrapper, DecimalField
@@ -16,6 +20,11 @@ from rest_framework import status, viewsets
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.core.cache import cache
+
+
 
 from application_multi_magasins.models import (
     Magasin, Produit, Stock, Vente, LigneVente, DemandeReappro
@@ -61,7 +70,7 @@ class DemandeReapproViewSet(viewsets.ModelViewSet):
     queryset = DemandeReappro.objects.all()
     serializer_class = DemandeReapproSerializer
 
-
+@method_decorator(cache_page(60 * 5), name='dispatch')
 class RapportVentesAPIView(APIView):
     """API pour le rapport des ventes."""
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
@@ -69,6 +78,8 @@ class RapportVentesAPIView(APIView):
 
     def get(self, request, response_format=None):
         """GET: Retourne le rapport des ventes."""
+        logger.info("Génération du rapport des ventes")
+        print("vue recalcuée")
         centre = get_object_or_404(Magasin, nom='CENTRE_LOGISTIQUE')
         ventes_par_magasin = (
             Vente.objects.exclude(magasin=centre)
@@ -106,7 +117,7 @@ class RapportVentesAPIView(APIView):
             'stock_restant': stock_restant
         })
 
-
+@method_decorator(cache_page(60 * 5), name='dispatch')
 class StockMagasinAPIView(APIView):
     """API pour afficher le stock d'un magasin."""
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]

@@ -30,6 +30,7 @@ ALLOWED_HOSTS = ['10.194.32.198', 'localhost', '127.0.0.1',
                  "lab3-web-2",
                  "lab3-web-3",
                  "lab3-web-4",
+                 'lb',
                  ]
 
 
@@ -74,6 +75,18 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+
 
 ROOT_URLCONF = 'laboratoire_bj.urls'
 
@@ -152,33 +165,44 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-import structlog
-structlog.configure(
-    processors=[
-        structlog.processors.TimeStamper(fmt="iso"),
-        structlog.processors.JSONRenderer()
-    ],
-    logger_factory=structlog.stdlib.LoggerFactory(),
-)
+# import structlog
+# structlog.configure(
+#     processors=[
+#         structlog.processors.TimeStamper(fmt="iso"),
+#         structlog.processors.JSONRenderer()
+#     ],
+#     logger_factory=structlog.stdlib.LoggerFactory(),
+# )
+# LOGGING = {
+#     "version": 1,
+#     "disable_existing_loggers": False,
+#     "formatters": {
+#         "json": {
+#             "()": "structlog.stdlib.ProcessorFormatter",
+#             "processor": structlog.processors.JSONRenderer(),
+#         },
+#     },
+#     "handlers": {
+#         "console": {
+#             "class": "logging.StreamHandler",
+#             "formatter": "json",
+#         },
+#     },
+#     "loggers": {
+#         "": {
+#             "handlers": ["console"],
+#             "level": "INFO",
+#         },
+#     },
+# }
+
 LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "json": {
-            "()": "structlog.stdlib.ProcessorFormatter",
-            "processor": structlog.processors.JSONRenderer(),
-        },
-    },
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-            "formatter": "json",
-        },
-    },
-    "loggers": {
-        "": {
-            "handlers": ["console"],
-            "level": "INFO",
+    'version': 1,
+    'handlers': { 'console': {'class': 'logging.StreamHandler'} },
+    'loggers': {
+        'django.cache': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
         },
     },
 }

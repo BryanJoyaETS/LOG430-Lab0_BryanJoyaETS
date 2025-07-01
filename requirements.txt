@@ -8,3 +8,5 @@ drf-yasg
 django-cors-headers
 django-prometheus
 structlog
+redis>=4.0.0
+django-redis>=5.0.0
