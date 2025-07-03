@@ -53,7 +53,7 @@ Scripts de test de charge :
 
 Résultats de mesure et tableaux comparatifs : 
 
-[`docs/Laboratoire4/resultats/`](../Laboratoire4/resultats/)
+[`docs/Laboratoire4/resultats/`](../Laboratoire4/Resultats/)
 
 Synthèse et interpretation des résultats :
 
