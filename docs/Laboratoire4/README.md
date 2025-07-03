@@ -188,6 +188,7 @@ LOGGING = {
 ### Configurations NGINX
 
 ## Round Robin :
+```
 
 upstream django_backend {
     zone django_backend 64k;            
@@ -213,8 +214,10 @@ server {
     }
 }
 
+```
 
 ## Weighted round robin : 
+```
 
 upstream django_backend {
     zone django_backend 64k;
@@ -243,8 +246,10 @@ server {
         proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
     }
 }
+```
 
 ## Least connection
+```
 
 upstream django_backend {
     least_conn;                     
@@ -270,9 +275,11 @@ server {
         proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
     }
 }
+```
 
 ## IP HASH
 
+```
 upstream django_backend { 
     ip_hash;
     server lab3-web-1:8000;
@@ -299,6 +306,7 @@ server {
         proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
     }
 }
+```
 
 ---
 
