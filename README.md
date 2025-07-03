@@ -49,17 +49,17 @@ Scripts de test de charge :
 [`k6/load-test.js`](k6/load-test.js)
 [`k6/load-test-2.js`](k6/load-test-2.js)
 
-Résultats de mesure et tableaux comparatifs : 
+Mes multiples résultats et captures (peu d'explication): 
 
-[`docs/Laboratoire4/resultats`](docs/Laboratoire4/resultats)
+[`docs/Laboratoire4/resultats/`](docs/Laboratoire4/resultats/)
 
 Synthèse et interpretation des résultats :
 
-[`docs/Laboratoire4/synthèse_des_resultats`](docs/Laboratoire4/synthèse_des_resultats)
+[`docs/Laboratoire4/synthese.pdf`](docs/Laboratoire4/synthese.pdf)
 
 ADRs : 
 
-[`docs/Laboratoire4/ADR`](docs/Laboratoire4/ADR)
+[`docs/Laboratoire4/ADR/`](docs/Laboratoire4/ADR/)
 
 
 

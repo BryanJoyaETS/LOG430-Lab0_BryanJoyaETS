@@ -165,37 +165,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# import structlog
-# structlog.configure(
-#     processors=[
-#         structlog.processors.TimeStamper(fmt="iso"),
-#         structlog.processors.JSONRenderer()
-#     ],
-#     logger_factory=structlog.stdlib.LoggerFactory(),
-# )
-# LOGGING = {
-#     "version": 1,
-#     "disable_existing_loggers": False,
-#     "formatters": {
-#         "json": {
-#             "()": "structlog.stdlib.ProcessorFormatter",
-#             "processor": structlog.processors.JSONRenderer(),
-#         },
-#     },
-#     "handlers": {
-#         "console": {
-#             "class": "logging.StreamHandler",
-#             "formatter": "json",
-#         },
-#     },
-#     "loggers": {
-#         "": {
-#             "handlers": ["console"],
-#             "level": "INFO",
-#         },
-#     },
-# }
-
 LOGGING = {
     'version': 1,
     'handlers': { 'console': {'class': 'logging.StreamHandler'} },

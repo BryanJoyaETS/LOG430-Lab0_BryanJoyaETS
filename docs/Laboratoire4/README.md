@@ -30,7 +30,7 @@ Ce laboratoire avait pour objectif d’améliorer les performances et la résili
 docker compose -p lab3 build --no-cache
 docker compose -p lab3 up -d db
 docker compose -p lab3 up -d redis
-RUN_TESTS=false docker compose -p lab3 up -d scale web=4
+RUN_TESTS=false docker compose -p lab3 up -d --scale web=4
 ```
 ---
 Une fois l'application démarrée, se rendre à l'adresse pour le site principal:  
@@ -38,6 +38,8 @@ Une fois l'application démarrée, se rendre à l'adresse pour le site principal
 
 Mon dashboard Graphana :
 [http://localhost:3000/dashboards](http://localhost:3000/dashboards)
+
+Golden Signals - Bryan Joya
 
 Mon scraping Prometheus :
 [http://10.194.32.198:8000/metrics/](http://10.194.32.198:8000/metrics/)
@@ -51,11 +53,11 @@ Scripts de test de charge :
 
 Résultats de mesure et tableaux comparatifs : 
 
-[`docs/Laboratoire4/resultats`](docs/Laboratoire4/resultats)
+[`docs/Laboratoire4/resultats/`](docs/Laboratoire4/resultats/)
 
 Synthèse et interpretation des résultats :
 
-[`docs/Laboratoire4/synthèse_des_resultats`](docs/Laboratoire4/synthèse_des_resultats)
+[`docs/Laboratoire4/synthese.pdf`](docs/Laboratoire4/synthese.pdf)
 
 ADRs : 
 
@@ -160,6 +162,143 @@ ADRs :
   - Dépend de Prometheus  
 - Rôle :  
   - Visualisation des métriques (dashboards, alertes)  
+
+#### Logging
+
+- **Service concerné** : Application Django  
+- **Configuration utilisée** :
+
+```python
+LOGGING = {
+    'version': 1,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler'
+        }
+    },
+    'loggers': {
+        'django.cache': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+    }
+}
+```
+
+### Configurations NGINX
+
+## Round Robin :
+
+upstream django_backend {
+    zone django_backend 64k;            
+    server web:8000 resolve;            
+}
+
+server {
+    listen 80;
+
+    location / {
+        proxy_pass         http://django_backend;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        add_header         X-Served-By       $upstream_addr;
+    }
+
+    location /metrics {
+        proxy_pass         http://django_backend/metrics;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+    }
+}
+
+
+## Weighted round robin : 
+
+upstream django_backend {
+    zone django_backend 64k;
+
+    server lab3-web-1:8000 resolve weight=4;
+    server lab3-web-2:8000 resolve weight=2;
+    server lab3-web-3:8000 resolve weight=2;
+    server lab3-web-4:8000 resolve weight=1;
+}
+
+server {
+    listen 80;
+
+    location / {
+        proxy_pass         http://django_backend;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        add_header         X-Served-By       $upstream_addr;
+    }
+
+    location /metrics {
+        proxy_pass         http://django_backend/metrics;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+    }
+}
+
+## Least connection
+
+upstream django_backend {
+    least_conn;                     
+    zone django_backend 64k;         
+    server web:8000 resolve;        
+}
+
+server {
+    listen 80;
+
+    location / {
+        proxy_pass         http://django_backend;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        add_header         X-Served-By       $upstream_addr;
+    }
+
+    location /metrics {
+        proxy_pass         http://django_backend/metrics;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+    }
+}
+
+## IP HASH
+
+upstream django_backend { 
+    ip_hash;
+    server lab3-web-1:8000;
+    server lab3-web-2:8000;
+    server lab3-web-3:8000;
+    server lab3-web-4:8000;
+}
+
+server {
+    listen 80;
+
+    location / {
+        proxy_pass         http://django_backend;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        add_header         X-Served-By       $upstream_addr;
+    }
+
+    location /metrics {
+        proxy_pass         http://django_backend/metrics;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+    }
+}
 
 ---
 
