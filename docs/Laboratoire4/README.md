@@ -3,7 +3,7 @@
 ## Laboratoire 4 — Load Balancing, Caching, Tests de charge et Observabilité
 
 > **Note :** Le fichier de documentation principal se trouve dans  
-> [`docs/Laboratoire4/README.md`](docs/Laboratoire4/README.md)
+> [`docs/Laboratoire4/README.md`](../Laboratoire4/README.md)
 
 ---
 
@@ -48,20 +48,20 @@ Les targets : [http://10.194.32.198:9090/targets](http://10.194.32.198:9090/targ
 
 Scripts de test de charge : 
 
-[`k6/load-test.js`](k6/load-test.js)
-[`k6/load-test-2.js`](k6/load-test-2.js)
+[`k6/load-test.js`](../../k6/load-test.js)
+[`k6/load-test-2.js`](../../k6/load-test-2.js)
 
 Résultats de mesure et tableaux comparatifs : 
 
-[`docs/Laboratoire4/resultats/`](docs/Laboratoire4/resultats/)
+[`docs/Laboratoire4/resultats/`](../Laboratoire4/resultats/)
 
 Synthèse et interpretation des résultats :
 
-[`docs/Laboratoire4/synthese.pdf`](docs/Laboratoire4/synthese.pdf)
+[`docs/Laboratoire4/synthese.pdf`](../Laboratoire4/synthese.pdf)
 
 ADRs : 
 
-[`docs/Laboratoire4/ADR`](docs/Laboratoire4/ADR)
+[`docs/Laboratoire4/ADR`](../Laboratoire4/ADR)
 
 
 ---
