@@ -1,27 +1,30 @@
 # LOG430-Lab0_BryanJoyaETS
 
-## Laboratoire 4 — Load Balancing, Caching, Tests de charge et Observabilité
+## Laboratoire 5 —  Passage à une Architecture Microservices avec API Gateway etObservabilité
 
 > **Note :** Le fichier de documentation principal se trouve dans  
-> [`docs/Laboratoire4/README.md`](docs/Laboratoire4/README.md)
+> [`docs/Laboratoire4/README.md`](docs/Laboratoire5/README.md)
 
 ---
 
-# Exposition d'API – Laboratoire 4
+# Exposition d'API – Laboratoire 5
 
 ## Résumé
 
-Ce laboratoire avait pour objectif d’améliorer les performances et la résilience d’une API RESTful multi-magasins en appliquant trois optimisations successives :
-- Instrumentation et test de charge
-- Répartition de charge et mise à l’échelle horizontale
-- Mise en cache des endpoints critiques
+Ce laboratoire est une extension directe du Labo 3, avec pour objectif de faire évoluer
+ votre système multi-magasins vers une architecture orientée microservices, adaptée à
+ un contexte e-commerce.
+ L’idée n’est pas d’ajouter une multitude de nouvelles fonctionnalités, mais de réorganiser
+ les services existants, en y ajoutant quelques services propres au commerce en ligne.
 
+# Objectifs pédagogiques
 
-## Objectifs
-- Mettre en place une observabilité fine (Prometheus + Grafana)
-- Identifier les goulets d’étranglement initiaux
-- Assurer une montée en charge fluide via un load balancer
-- Réduire la latence et la charge serveur grâce au caching
+- Comprendre les fondements de l’architecture basée sur services (SBA) et microservices.
+- Découper un système monolithique en services plus petits (sans réécrire toute la logique). Cloud Gateway...);
+- la distinction entre les composantes du magasin physique (par exemple gestion des rayons, caisses, etc.) et celles d’un site e-commerce (compte client, panier, commande);
+- Mettre en place une API Gateway (comme Kong, Spring Cloud Gateway, APISIX ou KrakenD).
+- Configurer des routes vers les services internes.
+- Protéger et documenter les points d’entrée via la Gateway
 
 
 ## Exécution du projet
@@ -35,33 +38,6 @@ RUN_TESTS=false docker compose -p lab3 up -d scale web=4
 ---
 Une fois l'application démarrée, se rendre à l'adresse pour le site principal:  
 [http://10.194.32.198:8000](http://10.194.32.198:8000)
-
-Mon dashboard Graphana :
-[http://localhost:3000/dashboards](http://localhost:3000/dashboards)
-
-Mon scraping Prometheus :
-[http://10.194.32.198:8000/metrics/](http://10.194.32.198:8000/metrics/)
-
-Les targets : [http://10.194.32.198:9090/targets](http://10.194.32.198:9090/targets)
-
-Scripts de test de charge : 
-
-[`k6/load-test.js`](k6/load-test.js)
-[`k6/load-test-2.js`](k6/load-test-2.js)
-
-Mes multiples résultats et captures (peu d'explication): 
-
-[`docs/Laboratoire4/resultats/`](docs/Laboratoire4/resultats/)
-
-Synthèse et interpretation des résultats :
-
-[`docs/Laboratoire4/synthese.pdf`](docs/Laboratoire4/synthese.pdf)
-
-ADRs : 
-
-[`docs/Laboratoire4/ADR/`](docs/Laboratoire4/ADR/)
-
-
 
 ---
 
