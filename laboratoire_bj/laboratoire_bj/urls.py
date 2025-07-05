@@ -61,25 +61,25 @@ urlpatterns = [
     ## Cas d'usages exposés via l'API
     ##--------------------------------------------------------------------------------------------------------------------------
     # Rapport des ventes  - UC1 - Générer un rapport consolidé des ventes
-    path('api/rapport/', RapportVentesAPIView.as_view(), name='rapport_ventes'),
-    # Stock d'un magasin  - UC2 consulter le stock d'un magasin spécifique
-    path('api/stock/<int:magasin_id>/', StockMagasinAPIView.as_view(), name='stock_magasin'),
-    # Tableau de bord des magasins - UC3 - Visualiser les performances des magasins
-    path('api/dashboard/', DashboardAPIView.as_view(), name='dashboard'),
-    # Page de demande de réapprovisionnement depuis un magasin
-    path('api/reappro/<int:stock_id>/', ReapproAPIView.as_view(), name='reappro'),
+    # path('api/rapport/', RapportVentesAPIView.as_view(), name='rapport_ventes'),
+    # # Stock d'un magasin  - UC2 consulter le stock d'un magasin spécifique
+    # path('api/stock/<int:magasin_id>/', StockMagasinAPIView.as_view(), name='stock_magasin'),
+    # # Tableau de bord des magasins - UC3 - Visualiser les performances des magasins
+    # path('api/dashboard/', DashboardAPIView.as_view(), name='dashboard'),
+    # # Page de demande de réapprovisionnement depuis un magasin
+    # path('api/reappro/<int:stock_id>/', ReapproAPIView.as_view(), name='reappro'),
     
-    # Traiter une demande de réapprovisionnement  - UC6 -Approvisionner un magasin depuis le centre logistique
-    path('api/demande/list/', TraitementDemandeReapproAPIView.as_view(), name='api_demandes_list'),
-    path('api/demandes/<int:demande_id>/action/', DemandeReapproActionAPIView.as_view(), name='api_demandes_action'),
+    # # Traiter une demande de réapprovisionnement  - UC6 -Approvisionner un magasin depuis le centre logistique
+    # path('api/demande/list/', TraitementDemandeReapproAPIView.as_view(), name='api_demandes_list'),
+    # path('api/demandes/<int:demande_id>/action/', DemandeReapproActionAPIView.as_view(), name='api_demandes_action'),
     
-    # Page de demande de réapprovisionnement pour un employé - UC5 - Demander un réapprovisionnement
-    path('api/demande_reappro_utilisateur/<int:stock_id>/', DemandeReapproAPIView.as_view(), name='demande_reappro_utilisateur'),
+    # # Page de demande de réapprovisionnement pour un employé - UC5 - Demander un réapprovisionnement
+    # path('api/demande_reappro_utilisateur/<int:stock_id>/', DemandeReapproAPIView.as_view(), name='demande_reappro_utilisateur'),
 
-    # Lister les produits
-    path('api/produit/list/', ListeProduitsAPIView.as_view(), name='liste_produits'),
-    # Modifier un produit - UC4 - Modifier les informations d'un produit
-    path('api/produit/<int:produit_id>/modifier/', ModifierProduitAPIView.as_view(), name='modifier_produit'),
+    # # Lister les produits
+    # path('api/produit/list/', ListeProduitsAPIView.as_view(), name='liste_produits'),
+    # # Modifier un produit - UC4 - Modifier les informations d'un produit
+    # path('api/produit/<int:produit_id>/modifier/', ModifierProduitAPIView.as_view(), name='modifier_produit'),
     ##---------------------------------------------------------------------------------------------------------------------------
     re_path(r'^swagger(?P<format>\.json|\.yaml)$',
             schema_view.without_ui(cache_timeout=0), name='schema-json'),

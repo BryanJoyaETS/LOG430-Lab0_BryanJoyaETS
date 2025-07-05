@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Tableau de Bord des Performances</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+        .alert-stock {
+            color: red;
+            font-weight: bold;
+        }
+        .back-button {
+            display: inline-block;
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tableau de Bord des Performances</h1>
+    <div class="container">
+        <!-- Section Chiffre d'affaires par magasin -->
+        <div class="section">
+            <h2>Chiffre d’affaires par magasin</h2>
+            <table id="table-chiffre-affaires">
+                <tr>
+                    <th>Magasin</th>
+                    <th>Total ventes ($)</th>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Section Alertes de rupture de stock -->
+        <div class="section">
+            <h2>Alertes de rupture de stock</h2>
+            <table id="table-rupture-stock">
+                <tr>
+                    <th>Magasin</th>
+                    <th>Produit</th>
+                    <th>Stock restant</th>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Section Produits en surstock -->
+        <div class="section">
+            <h2>Produits en surstock</h2>
+            <table id="table-surstock">
+                <tr>
+                    <th>Magasin</th>
+                    <th>Produit</th>
+                    <th>Quantité en stock</th>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Section Tendances hebdomadaires -->
+        <div class="section">
+            <h2>Tendances hebdomadaires</h2>
+            <table id="table-tendances">
+                <tr>
+                    <th>Magasin</th>
+                    <th>Ventes cette semaine</th>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <br>
+    <a href="/" class="back-button">Retour à l'accueil</a>
+
+    <script>
+      fetch('/api/dashboard/?format=json')
+        .then(response => response.json())
+        .then(data => {
+          const tableChiffre = document.getElementById('table-chiffre-affaires');
+          data.chiffre_affaires.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${item.magasin__nom}</td>
+                             <td>${item.total}</td>`;
+            tableChiffre.appendChild(row);
+          });
+
+          const tableRupture = document.getElementById('table-rupture-stock');
+          data.ruptures_stock.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${item.magasin__nom}</td>
+                             <td>${item.produit__nom}</td>
+                             <td class="alert-stock">${item.quantite}</td>`;
+            tableRupture.appendChild(row);
+          });
+
+          const tableSurstock = document.getElementById('table-surstock');
+          data.surstock.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${item.magasin__nom}</td>
+                             <td>${item.produit__nom}</td>
+                             <td>${item.quantite}</td>`;
+            tableSurstock.appendChild(row);
+          });
+
+          const tableTendances = document.getElementById('table-tendances');
+          data.tendances.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${item.magasin__nom}</td>
+                             <td>${item.total_quantite}</td>`;
+            tableTendances.appendChild(row);
+          });
+        })
+        .catch(error => console.error('Erreur lors du chargement du tableau de bord:', error));
+    </script>
+</body>
+</html>

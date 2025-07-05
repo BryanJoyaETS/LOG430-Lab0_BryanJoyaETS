@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Liste des Produits</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    li {
+      border-bottom: 1px solid #ddd;
+      padding: 10px;
+    }
+    li a {
+      color: #007BFF;
+      text-decoration: none;
+      font-weight: bold;
+      margin-left: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Liste des Produits</h1>
+    <div id="produits-container">
+      <p>Chargement des produits…</p>
+    </div>
+  </div>
+  
+  <script>
+    // Appel de l'API pour récupérer la liste des produits
+    fetch('/api/produit/list?format=json')
+      .then(response => response.json())
+      .then(data => {
+         let html = '';
+         if (data.length === 0) {
+            html = '<p>Aucun produit trouvé.</p>';
+         } else {
+            html = '<ul>';
+            data.forEach(produit => {
+              html += `<li>
+                          <strong>${produit.nom}</strong>
+                          (${produit.categorie ? produit.categorie : 'Sans catégorie'})
+                          - ${produit.prix} €
+                          <a href="/api/produit/${produit.id}/modifier/?format=html">Modifier</a>
+                       </li>`;
+            });
+            html += '</ul>';
+         }
+         document.getElementById("produits-container").innerHTML = html;
+      })
+      .catch(error => {
+         console.error("Erreur lors du chargement des produits :", error);
+         document.getElementById("produits-container").innerHTML = '<p>Erreur lors du chargement des produits.</p>';
+      });
+  </script>
+</body>
+</html>

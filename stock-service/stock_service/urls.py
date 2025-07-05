@@ -16,7 +16,24 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-
+from stocks.views import (
+    StockMagasinAPIView, ReapproAPIView, TraitementDemandeReapproAPIView,
+    DemandeReapproActionAPIView, DemandeReapproAPIView
+)
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    # Stock d'un magasin  - UC2 consulter le stock d'un magasin spécifique
+    path('api/stock/<int:magasin_id>/', StockMagasinAPIView.as_view(), name='stock_magasin'),
+
+    # Page de demande de réapprovisionnement depuis un magasin
+    path('api/reappro/<int:stock_id>/', ReapproAPIView.as_view(), name='reappro'),
+    
+    # Traiter une demande de réapprovisionnement  - UC6 -Approvisionner un magasin depuis le centre logistique
+    path('api/demande/list/', TraitementDemandeReapproAPIView.as_view(), name='api_demandes_list'),
+    path('api/demandes/<int:demande_id>/action/', DemandeReapproActionAPIView.as_view(), name='api_demandes_action'),
+    
+    # Page de demande de réapprovisionnement pour un employé - UC5 - Demander un réapprovisionnement
+    path('api/demande_reappro_utilisateur/<int:stock_id>/', DemandeReapproAPIView.as_view(), name='demande_reappro_utilisateur'),
+
 ]
