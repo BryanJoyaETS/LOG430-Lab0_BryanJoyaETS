@@ -94,7 +94,7 @@
         // Fonction pour récupérer les demandes via l'API
         async function fetchDemandes() {
             try {
-                const response = await fetch('/api/demandes/');
+                const response = await fetch('/api/stock/demande/list/');
                 if (response.ok) {
                     const data = await response.json();
                     populateTable(data);
@@ -134,7 +134,7 @@
         async function handleAction(demandeId, action) {
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             try {
-                const response = await fetch(`/api/demandes/${demandeId}/action/`, {
+                const response = await fetch(`/api/stock/demandes/${demandeId}/action/`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

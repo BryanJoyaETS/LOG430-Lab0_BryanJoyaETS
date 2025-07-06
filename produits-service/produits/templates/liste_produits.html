@@ -45,7 +45,7 @@
   
   <script>
     // Appel de l'API pour récupérer la liste des produits
-    fetch('/api/produit/list?format=json')
+    fetch('/api/produits/list?format=json')
       .then(response => response.json())
       .then(data => {
          let html = '';
@@ -58,7 +58,7 @@
                           <strong>${produit.nom}</strong>
                           (${produit.categorie ? produit.categorie : 'Sans catégorie'})
                           - ${produit.prix} €
-                          <a href="/api/produit/${produit.id}/modifier/?format=html">Modifier</a>
+                          <a href="/api/produits/${produit.id}/modifier/?format=html">Modifier</a>
                        </li>`;
             });
             html += '</ul>';

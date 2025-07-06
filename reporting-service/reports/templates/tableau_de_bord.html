@@ -111,7 +111,7 @@
     <a href="/" class="back-button">Retour à l'accueil</a>
 
     <script>
-      fetch('/api/dashboard/?format=json')
+      fetch('/api/rapport/dashboard/?format=json')
         .then(response => response.json())
         .then(data => {
           const tableChiffre = document.getElementById('table-chiffre-affaires');

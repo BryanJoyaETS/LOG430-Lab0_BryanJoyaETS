@@ -21,7 +21,7 @@ from produits.views import ListeProduitsAPIView, ModifierProduitAPIView
 urlpatterns = [
     path('admin/', admin.site.urls),
     # Lister les produits
-    path('api/produit/list/', ListeProduitsAPIView.as_view(), name='liste_produits'),
+    path('api/produits/list/', ListeProduitsAPIView.as_view(), name='liste_produits'),
     # Modifier un produit - UC4 - Modifier les informations d'un produit
-    path('api/produit/<int:produit_id>/modifier/', ModifierProduitAPIView.as_view(), name='modifier_produit'),
+    path('api/produits/<int:produit_id>/modifier/', ModifierProduitAPIView.as_view(), name='modifier_produit'),
 ]

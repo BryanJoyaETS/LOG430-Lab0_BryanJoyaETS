@@ -75,7 +75,7 @@
                         <h2>${stock.produit.nom}</h2>
                         <p><strong>Quantité disponible :</strong> ${stock.quantite}</p>
                         ${data.magasin.nom !== "CENTRE_LOGISTIQUE" ?
-                          `<a href="/api/reappro/${stock.id}/" class="reappro-button">Demande de réapprovisionnement</a>` 
+                          `<a href="/api/stock/reappro/${stock.id}/" class="reappro-button">Demande de réapprovisionnement</a>` 
                           : ''}
                   `;
                   container.appendChild(card);

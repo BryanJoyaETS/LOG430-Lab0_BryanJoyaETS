@@ -88,7 +88,7 @@
     const stockId = pathParts[pathParts.length - 1];
 
     // Charge les infos du stock pour affichage
-    fetch(`/api/reappro/${stockId}/?format=json`)
+    fetch(`/api/stock/reappro/${stockId}/?format=json`)
       .then(response => response.json())
       .then(data => {
         document.getElementById('magasin-nom').textContent = data.magasin.nom;
@@ -113,7 +113,7 @@
       }
 
       try {
-        const response = await fetch(`/api/demande_reappro_utilisateur/${stockId}/`, {
+        const response = await fetch(`/api/stock/demande_reappro_utilisateur/${stockId}/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

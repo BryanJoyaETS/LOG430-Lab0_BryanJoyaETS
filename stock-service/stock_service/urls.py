@@ -27,13 +27,13 @@ urlpatterns = [
     path('api/stock/<int:magasin_id>/', StockMagasinAPIView.as_view(), name='stock_magasin'),
 
     # Page de demande de réapprovisionnement depuis un magasin
-    path('api/reappro/<int:stock_id>/', ReapproAPIView.as_view(), name='reappro'),
+    path('api/stock/reappro/<int:stock_id>/', ReapproAPIView.as_view(), name='reappro'),
     
     # Traiter une demande de réapprovisionnement  - UC6 -Approvisionner un magasin depuis le centre logistique
-    path('api/demande/list/', TraitementDemandeReapproAPIView.as_view(), name='api_demandes_list'),
-    path('api/demandes/<int:demande_id>/action/', DemandeReapproActionAPIView.as_view(), name='api_demandes_action'),
+    path('api/stock/demande/list/', TraitementDemandeReapproAPIView.as_view(), name='api_demandes_list'),
+    path('api/stock/demandes/<int:demande_id>/action/', DemandeReapproActionAPIView.as_view(), name='api_demandes_action'),
     
     # Page de demande de réapprovisionnement pour un employé - UC5 - Demander un réapprovisionnement
-    path('api/demande_reappro_utilisateur/<int:stock_id>/', DemandeReapproAPIView.as_view(), name='demande_reappro_utilisateur'),
+    path('api/stock/demande_reappro_utilisateur/<int:stock_id>/', DemandeReapproAPIView.as_view(), name='demande_reappro_utilisateur'),
 
 ]

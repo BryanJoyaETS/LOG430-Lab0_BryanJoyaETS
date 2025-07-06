@@ -97,7 +97,7 @@
     <a href="/" class="back-button">Retour à l'accueil</a>
 
     <script>
-      fetch('/api/rapport/?format=json')
+      fetch('/api/rapport/ventes/?format=json')
         .then(response => response.json())
         .then(data => {
           const tableVentes = document.getElementById('table-ventes-magasin');

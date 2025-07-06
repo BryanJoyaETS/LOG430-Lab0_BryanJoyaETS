@@ -59,7 +59,7 @@
     const produitId = pathParts[3];  // Pour /api/produit/42/modifier/, l'élément d'indice 3 sera "42"
 
     // Appel de l'API pour récupérer les détails du produit
-    fetch(`/api/produit/${produitId}/modifier/?format=json`)
+    fetch(`/api/produits/${produitId}/modifier/?format=json`)
       .then(response => response.json())
       .then(produit => {
          // Création du formulaire prérempli avec les données du produit
@@ -88,7 +88,7 @@
               prix: document.getElementById("prix").value,
             };
             
-            fetch(`/api/produit/${produitId}/modifier/?format=json`, {
+            fetch(`/api/produits/${produitId}/modifier/?format=json`, {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json',
