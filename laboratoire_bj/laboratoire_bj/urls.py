@@ -87,7 +87,7 @@ urlpatterns = [
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     ##---------------------------------------------------------------------------------------------------------------------------
-    ## Fonctionnalités de l'interface caisse qui n'utilisent pas l'API
+    # Fonctionnalités de l'interface caisse qui n'utilisent pas l'API
     path('caisse/<int:magasin_id>/', interface_caisse, name='menu_caisse'),
     # 1. Recherche de produit
     path('caisse/<int:magasin_id>/recherche/',recherche_produit,name='recherche_produit'),

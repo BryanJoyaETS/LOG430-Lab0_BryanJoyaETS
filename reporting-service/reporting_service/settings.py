@@ -32,6 +32,7 @@ ALLOWED_HOSTS = [
     "web",
     "produits",
     "stocks",
+    "carts",
     "rapports",
     "lab3-web-1",
     "lab3-web-2",

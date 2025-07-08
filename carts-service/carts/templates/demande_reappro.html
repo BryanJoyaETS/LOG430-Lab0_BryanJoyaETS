@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Demande de Réapprovisionnement</title>
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #eef2f7;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+    .info {
+      font-size: 16px;
+      margin: 10px 0;
+    }
+    input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
+    .btn {
+      background: #28a745;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+    .back-link, .back-button {
+      display: inline-block;
+      margin-top: 20px;
+      text-decoration: none;
+      color: white;
+      background: #007BFF;
+      padding: 10px 15px;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    .back-link:hover, .back-button:hover {
+      text-decoration: underline;
+    }
+    #message p {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 id="titre-reappro">Demande de Réapprovisionnement</h1>
+    <p class="info"><strong>Magasin :</strong> <span id="magasin-nom"></span></p>
+    <p class="info"><strong>Produit :</strong> <span id="produit-nom"></span></p>
+    <p class="info"><strong>Stock local :</strong> <span id="stock-local"></span> unité(s)</p>
+    <p class="info"><strong>Stock central :</strong> <span id="stock-central"></span> unité(s)</p>
+    
+    <form id="demande-form">
+      <input type="number" id="quantite-input" name="quantite" placeholder="Quantité à ajouter" min="1" required>
+      <button type="submit" class="btn">Envoyer la demande</button>
+    </form>
+    
+    <div id="message"></div>
+    
+    <a href="/" class="back-button">Retour à la liste des magasins</a>
+  </div>
+  
+  <script>
+    // Récupère le stock_id depuis l'URL
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    const stockId = pathParts[pathParts.length - 1];
+
+    // Charge les infos du stock pour affichage
+    fetch(`/api/reappro/${stockId}/?format=json`)
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('magasin-nom').textContent = data.magasin.nom;
+        document.getElementById('produit-nom').textContent = data.produit.nom;
+        document.getElementById('stock-local').textContent = data.stock_local;
+        document.getElementById('stock-central').textContent = data.stock_central;
+        document.getElementById('titre-reappro').textContent = `Demande de Réapprovisionnement – ${data.produit.nom}`;
+        document.getElementById('back-link').href = `/api/stock/${data.magasin.id}/`;
+      })
+
+    // Gestion de l'envoi du formulaire
+    document.getElementById("demande-form").addEventListener("submit", async function(event) {
+      event.preventDefault();
+      const quantite = document.getElementById("quantite-input").value;
+      const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+      const messageDiv = document.getElementById("message");
+      messageDiv.innerHTML = "";
+
+      if (!quantite || quantite < 1) {
+        messageDiv.innerHTML = '<p style="color:red;">Veuillez entrer une quantité valide.</p>';
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/demande_reappro_utilisateur/${stockId}/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+          },
+          body: JSON.stringify({ quantite: quantite })
+        });
+        const data = await response.json();
+        if (response.ok) {
+          messageDiv.innerHTML = `<p style="color:green;">${data.message}</p>`;
+          setTimeout(() => {
+            window.location.href = `/api/stock/${data.magasin_id}/`;
+          }, 1200);
+        } else {
+          messageDiv.innerHTML = `<p style="color:red;">${data.error || "Erreur lors de la demande."}</p>`;
+        }
+      } catch (error) {
+        messageDiv.innerHTML = '<p style="color:red;">Erreur réseau lors de la demande.</p>';
+      }
+    });
+  </script>
+</body>
+</html>

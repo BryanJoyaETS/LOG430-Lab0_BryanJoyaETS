@@ -1,22 +1,36 @@
-"""
-URL configuration for cart_service project.
+from django.urls import path, include
+from . import views as cart_views
+from rest_framework.routers import DefaultRouter
+from carts.views import (
+    CartReapproAPIView, MagasinViewSet, StockViewSet, VenteViewSet,
+    RechercheProduitAPIView, EnregistrerVenteAPIView,
+    TraiterRetourAPIView, HistoriqueTransactionsAPIView
+)
 
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-from django.contrib import admin
-from django.urls import path
+router = DefaultRouter()
+router.register('magasins', MagasinViewSet, basename='magasin')
+router.register('stock',    StockViewSet,   basename='stock')
+router.register('ventes',   VenteViewSet,   basename='vente')
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # --- Front HTML “caisse” ---
+    path('caisse/<int:magasin_id>/',                cart_views.interface_caisse,       name='interface_caisse'),
+    path('caisse/<int:magasin_id>/recherche/',      cart_views.recherche_html,         name='recherche_html'),
+    path('caisse/<int:magasin_id>/vente/',          cart_views.vente_html,             name='vente_html'),
+    path('caisse/<int:magasin_id>/retour/',         cart_views.retour_html,            name='retour_html'),
+    path('caisse/<int:magasin_id>/historique/',     cart_views.historique_html,        name='historique_html'),
+    path('caisse/reappro/<int:stock_id>/',          cart_views.demande_reappro_html,   name='demande_reappro_html'),
+
+    # --- API REST ---
+    path('api/', include(router.urls)),
+    path('api/caisse/<int:magasin_id>/recherche/',
+         RechercheProduitAPIView.as_view(),        name='recherche_produit'),
+    path('api/caisse/<int:magasin_id>/vente/',
+         EnregistrerVenteAPIView.as_view(),        name='enregistrer_vente'),
+    path('api/caisse/<int:magasin_id>/retour/',
+         TraiterRetourAPIView.as_view(),           name='traiter_retour'),
+    path('api/caisse/<int:magasin_id>/historique/',
+         HistoriqueTransactionsAPIView.as_view(),  name='historique_transactions'),
+    path('api/reappro/<int:stock_id>/',
+         CartReapproAPIView.as_view(),             name='api_reappro'),
 ]

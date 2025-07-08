@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Effectuer une vente – {{ magasin.nom }}</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 40px;
+      text-align: center;
+    }
+    .card {
+      background: white;
+      display: inline-block;
+      padding: 20px 30px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      max-width: 400px;
+      width: 100%;
+    }
+    form input {
+      width: 100%;
+      padding: 8px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .btn {
+      background: #28a745;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .btn:hover { background: #218838; }
+    .back {
+      display: block;
+      margin-top: 20px;
+      color: #007bff;
+      text-decoration: none;
+    }
+    .message {
+      margin-bottom: 15px;
+      font-weight: bold;
+      color: green;
+    }
+    .error {
+      color: red;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Effectuer une vente</h1>
+    <h3>Magasin : {{ magasin.nom }}</h3>
+
+    {% if message %}
+      <div class="{% if 'enregistrée' in message %}message{% else %}error{% endif %}">
+        {{ message }}
+      </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'enregistrer_vente' magasin.id %}">
+      {% csrf_token %}
+      <input type="text" name="produit_id" placeholder="ID du produit">
+      <input type="text" name="quantite"  placeholder="Quantité vendue">
+      <button type="submit" class="btn">Enregistrer la vente</button>
+    </form>
+
+    <a href="{% url 'menu_caisse' magasin.id %}" class="back">← Retour au menu de la caisse</a>
+  </div>
+</body>
+</html>

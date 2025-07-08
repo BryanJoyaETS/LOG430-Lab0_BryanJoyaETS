@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Rechercher un produit – {{ magasin.nom }}</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 40px;
+      text-align: center;
+    }
+    .card {
+      background: white;
+      display: inline-block;
+      padding: 20px 30px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      max-width: 400px;
+      width: 100%;
+    }
+    form input {
+      width: 100%;
+      padding: 8px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .btn {
+      background: #007bff;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .btn:hover { background: #0056b3; }
+    .back {
+      display: block;
+      margin-top: 20px;
+      color: #007bff;
+      text-decoration: none;
+    }
+    .error {
+      color: red;
+      margin-bottom: 10px;
+    }
+    .results {
+      text-align: left;
+      margin-top: 20px;
+    }
+    .results ul {
+      list-style: none;
+      padding: 0;
+    }
+    .results li {
+      padding: 6px 0;
+      border-bottom: 1px solid #eee;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Rechercher un produit</h1>
+    <h3>Magasin : {{ magasin.nom }}</h3>
+
+    {% if message_erreur %}
+      <div class="error">{{ message_erreur }}</div>
+    {% endif %}
+
+    <form method="post" action="{% url 'recherche_produit' magasin.id %}">
+      {% csrf_token %}
+      <input type="text" name="identifiant" placeholder="ID du produit">
+      <input type="text" name="nom"        placeholder="Nom du produit">
+      <input type="text" name="categorie"  placeholder="Catégorie">
+      <button type="submit" class="btn">Rechercher</button>
+    </form>
+
+    {% if resultats %}
+    <div class="results">
+      <h4>Résultats :</h4>
+      <ul>
+        {% for stock in resultats %}
+          <li>
+            {{ stock.produit.id }} – <strong>{{ stock.produit.nom }}</strong>
+            {% if stock.produit.categorie %} ({{ stock.produit.categorie }}){% endif %}
+            – Stock: {{ stock.quantite }}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+
+    <a href="{% url 'menu_caisse' magasin.id %}" class="back">
+      ← Retour au menu de la caisse
+    </a>
+  </div>
+</body>
+</html>
