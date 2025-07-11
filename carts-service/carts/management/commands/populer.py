@@ -4,7 +4,7 @@ Module pour peupler la base de données avec des données de démonstration.
 # pylint: disable=no-member
 
 from django.core.management.base import BaseCommand
-from produits.models import Produit, Magasin, Stock
+from carts.models import Produit, Magasin, Stock
 
 
 class Command(BaseCommand):

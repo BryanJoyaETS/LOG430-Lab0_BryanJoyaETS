@@ -88,15 +88,15 @@ urlpatterns = [
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     ##---------------------------------------------------------------------------------------------------------------------------
     # Fonctionnalités de l'interface caisse qui n'utilisent pas l'API
-    path('caisse/<int:magasin_id>/', interface_caisse, name='menu_caisse'),
-    # 1. Recherche de produit
-    path('caisse/<int:magasin_id>/recherche/',recherche_produit,name='recherche_produit'),
-    # 2. Enregistrer une vente
-    path('caisse/<int:magasin_id>/vente/',enregistrer_vente,name='enregistrer_vente'),
-    # 3. Traiter un retour
-    path('caisse/<int:magasin_id>/retour/',traiter_retour,name='traiter_retour'),
-    # 4. Historique des transactions
-    path('caisse/<int:magasin_id>/historique/',historique_transactions,name='historique_transactions'),
+    # path('caisse/<int:magasin_id>/', interface_caisse, name='menu_caisse'),
+    # # 1. Recherche de produit
+    # path('caisse/<int:magasin_id>/recherche/',recherche_produit,name='recherche_produit'),
+    # # 2. Enregistrer une vente
+    # path('caisse/<int:magasin_id>/vente/',enregistrer_vente,name='enregistrer_vente'),
+    # # 3. Traiter un retour
+    # path('caisse/<int:magasin_id>/retour/',traiter_retour,name='traiter_retour'),
+    # # 4. Historique des transactions
+    # path('caisse/<int:magasin_id>/historique/',historique_transactions,name='historique_transactions'),
 
 
     ##-------------------------------------------metriques------------------------------------------------------------------------------

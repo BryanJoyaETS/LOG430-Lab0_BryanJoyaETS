@@ -54,11 +54,11 @@
 <body>
   <h1>Menu de la caisse – {{ magasin.nom }}</h1>
   <ul>
-    <li><a href="{% url 'carts:recherche_produit' magasin.id %}">1. Rechercher un produit</a></li>
-    <li><a href="{% url 'carts:enregistrer_vente' magasin.id %}">2. Enregistrer une vente</a></li>
-    <li><a href="{% url 'carts:traiter_retour' magasin.id %}">3. Traiter un retour</a></li>
-    <li><a href="{% url 'carts:consulter_stock' magasin.id %}">4. Consulter le stock</a></li>
-    <li><a href="{% url 'carts:historique_transactions' magasin.id %}">5. Historique des transactions</a></li>
+  <li><a href="/api/caisse/{{ magasin.id }}/recherche/">1. Rechercher un produit</a></li>
+  <li><a href="/api/caisse/{{ magasin.id }}/vente/">2. Enregistrer une vente</a></li>
+  <li><a href="/api/caisse/{{ magasin.id }}/retour/">3. Traiter un retour</a></li>
+  <li><a href="/api/stock/{{ magasin.id }}/">4. Consulter le stock</a></li>
+  <li><a href="/api/caisse/{{ magasin.id }}/historique/">5. Historique des transactions</a></li>
   </ul>
   <a href="/" class="back-button">← Retour à l'accueil</a>
 </body>
