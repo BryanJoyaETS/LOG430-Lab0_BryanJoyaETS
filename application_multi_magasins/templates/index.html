@@ -122,7 +122,7 @@
               <a href="/api/stock/${magasin.id}" class="button">
                 Voir le stock
               </a>
-              ${magasin.nom !== "CENTRE_LOGISTIQUE" ? `<a href="/caisse/${magasin.id}/" class="button caisse-button">
+              ${magasin.nom !== "CENTRE_LOGISTIQUE" ? `<a href="api/caisse/${magasin.id}/" class="button caisse-button">
                 Ouvrir une caisse
               </a>` : ''}
             </div>

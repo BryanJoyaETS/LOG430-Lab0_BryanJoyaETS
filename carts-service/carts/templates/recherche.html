@@ -70,7 +70,8 @@
       <div class="error">{{ message_erreur }}</div>
     {% endif %}
 
-    <form method="post" action="{% url 'recherche_produit' magasin.id %}">
+    <form method="post"
+          action="{% url 'recherche_produit' magasin.id %}">
       {% csrf_token %}
       <input type="text" name="identifiant" placeholder="ID du produit">
       <input type="text" name="nom"        placeholder="Nom du produit">
@@ -93,8 +94,7 @@
     </div>
     {% endif %}
 
-
-    <a href="{% url 'menu_caisse' magasin.id %}" class="back">
+    <a href="{% url 'interface_caisse_api' magasin.id %}" class="back">
       ← Retour au menu de la caisse
     </a>
   </div>

@@ -29,6 +29,10 @@ class RechercheProduitAPIView(APIView):
     renderer_classes = [JSONRenderer, TemplateHTMLRenderer]
     template_name = 'recherche.html'
 
+    def get(self, request, magasin_id):
+        magasin = get_object_or_404(Magasin, id=magasin_id)
+        return Response({'magasin': magasin})
+
     def post(self, request, magasin_id):
         magasin = get_object_or_404(Magasin, id=magasin_id)
         filtres = {}
@@ -69,20 +73,24 @@ class RechercheProduitAPIView(APIView):
 # 4) Enregistrer une vente (HTML form + JSON via POST)
 class EnregistrerVenteAPIView(APIView):
     renderer_classes = [JSONRenderer, TemplateHTMLRenderer]
-    template_name = 'vente.html'
+    template_name   = 'vente.html'
+
+    def get(self, request, magasin_id):
+        magasin = get_object_or_404(Magasin, id=magasin_id)
+        return Response({'magasin': magasin})
 
     def post(self, request, magasin_id):
         magasin = get_object_or_404(Magasin, id=magasin_id)
         message = None
-        data = request.data
-        # Validation
+        data    = request.data
         try:
-            prod_id = int(data.get('produit_id'))
-            quantite = int(data.get('quantite'))
+            prod_id   = int(data.get('produit_id'))
+            quantite  = int(data.get('quantite'))
             if quantite <= 0:
                 raise ValueError()
         except (TypeError, ValueError):
             message = 'Les données saisies sont invalides.'
+
         if not message:
             try:
                 stock = Stock.objects.get(magasin=magasin, produit__id=prod_id)
@@ -99,50 +107,74 @@ class EnregistrerVenteAPIView(APIView):
                         )
                         stock.quantite -= quantite
                         stock.save()
-                    message = f'Vente enregistrée : {quantite} x {stock.produit.nom}.'
+                    message = f'Vente enregistrée : {quantite} x {stock.produit.nom}.'
             except Stock.DoesNotExist:
                 message = 'Produit introuvable dans ce magasin.'
-        # JSON
+
         if request.accepted_renderer.format == 'json':
-            if message.startswith('Vente enregistrée'):
+            if message and message.startswith('Vente enregistrée'):
                 serializer = VenteSerializer(vente)
                 return Response(serializer.data, status=201)
             return Response({'detail': message}, status=400)
-        # HTML
+
         return Response({'magasin': magasin, 'message': message})
 
+
 # 5) Traiter un retour (HTML form + JSON via POST)
+from django.db import transaction, DatabaseError
+from django.shortcuts import get_object_or_404
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
+from rest_framework import status
+
+from .models import Magasin, Vente, Stock, LigneVente
+
 class TraiterRetourAPIView(APIView):
     renderer_classes = [JSONRenderer, TemplateHTMLRenderer]
-    template_name = 'retour.html'
+    template_name   = 'retour.html'
+
+    def get(self, request, magasin_id):
+        """
+        Affiche le formulaire HTML de retour de vente.
+        """
+        magasin = get_object_or_404(Magasin, id=magasin_id)
+        return Response({'magasin': magasin})
 
     def post(self, request, magasin_id):
+        """
+        Traite la soumission du formulaire (HTML) ou du JSON (API).
+        """
         magasin = get_object_or_404(Magasin, id=magasin_id)
         message = None
+
         try:
             vid = int(request.data.get('vente_id', ''))
             vente = Vente.objects.get(id=vid, magasin=magasin)
-            with transaction.atomic():
-                for ligne in vente.lignes.all():
-                    stock, _ = Stock.objects.get_or_create(
-                        magasin=magasin,
-                        produit=ligne.produit,
-                        defaults={'quantite': 0}
-                    )
-                    stock.quantite += ligne.quantite
-                    stock.save()
-                vente.delete()
-            message = f'Vente {vid} annulée, stock mis à jour.'
-        except (ValueError, Vente.DoesNotExist) as e:
+        except (ValueError, Vente.DoesNotExist):
             message = 'ID de vente invalide ou vente introuvable.'
-        except DatabaseError:
-            message = 'Erreur lors du traitement du retour.'
-        # JSON
+        else:
+            try:
+                with transaction.atomic():
+                    for ligne in vente.lignes.all():
+                        stock, _ = Stock.objects.get_or_create(
+                            magasin=magasin,
+                            produit=ligne.produit,
+                            defaults={'quantite': 0}
+                        )
+                        stock.quantite += ligne.quantite
+                        stock.save()
+                    vente.delete()
+                message = f'Vente {vid} annulée, stock mis à jour.'
+            except DatabaseError:
+                message = 'Erreur lors du traitement du retour.'
+
         if request.accepted_renderer.format == 'json':
-            status_code = 200 if message.startswith('Vente') else 400
-            return Response({'detail': message}, status=status_code)
-        # HTML
+            code = status.HTTP_200_OK if message.startswith('Vente') else status.HTTP_400_BAD_REQUEST
+            return Response({'detail': message}, status=code)
+
         return Response({'magasin': magasin, 'message': message})
+
 
 # 6) Historique des transactions (HTML + JSON)
 class HistoriqueTransactionsAPIView(APIView):

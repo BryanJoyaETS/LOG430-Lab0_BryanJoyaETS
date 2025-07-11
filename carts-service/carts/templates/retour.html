@@ -63,13 +63,11 @@
       background-color: #0056b3;
     }
 
-    
     p {
       font-size: 16px;
       line-height: 1.5;
     }
 
-    
     a.back {
       display: inline-block;
       margin-top: 20px;
@@ -88,16 +86,23 @@
 <body>
   <div class="container">
     <h1>Traiter un retour pour le magasin {{ magasin.nom }}</h1>
-    <form method="POST" action="">
+
+    <form method="POST" action="{% url 'traiter_retour' magasin.id %}">
       {% csrf_token %}
       <label for="vente_id">ID de la vente à annuler :</label>
       <input type="text" name="vente_id" id="vente_id" required>
       <input type="submit" value="Traiter le retour">
     </form>
+
     {% if message %}
       <p>{{ message }}</p>
     {% endif %}
-    <p><a href="{% url 'menu_caisse' magasin.id %}" class="back">← Retour au menu de la caisse</a></p>
+
+    <p>
+      <a href="{% url 'interface_caisse_api' magasin.id %}" class="back">
+        ← Retour au menu de la caisse
+      </a>
+    </p>
   </div>
 </body>
 </html>

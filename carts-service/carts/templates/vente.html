@@ -66,14 +66,17 @@
       </div>
     {% endif %}
 
-    <form method="post" action="{% url 'enregistrer_vente' magasin.id %}">
+    <form method="post"
+          action="/api/caisse/{{ magasin.id }}/vente/">
       {% csrf_token %}
       <input type="text" name="produit_id" placeholder="ID du produit">
-      <input type="text" name="quantite"  placeholder="Quantité vendue">
+      <input type="text" name="quantite"   placeholder="Quantité vendue">
       <button type="submit" class="btn">Enregistrer la vente</button>
     </form>
 
-    <a href="{% url 'menu_caisse' magasin.id %}" class="back">← Retour au menu de la caisse</a>
+    <a href="/api/caisse/{{ magasin.id }}/" class="back">
+      ← Retour au menu de la caisse
+    </a>
   </div>
 </body>
 </html>
