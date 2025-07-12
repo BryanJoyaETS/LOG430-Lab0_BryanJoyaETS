@@ -1,109 +1,165 @@
-from rest_framework import status
-from rest_framework.test import APITestCase, APIClient
+"""
+Tests pour les ViewSets de l'application application_multi_magasins
+"""
 from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APIClient, APITestCase
+
 from application_multi_magasins.models import (
-    Magasin, Produit, Stock, Vente, LigneVente, DemandeReappro
+    DemandeReappro,
+    LigneVente,
+    Magasin,
+    Produit,
+    Stock,
+    Vente,
 )
 
+
 class MagasinViewSetTest(APITestCase):
+    """Tests pour le ViewSet Magasin"""
+
     def setUp(self):
         self.client = APIClient()
-        self.m1 = Magasin.objects.create(nom='M1', adresse='Adr1')
-        self.m2 = Magasin.objects.create(nom='M2', adresse='Adr2')
+        Magasin.objects.create(nom="M1", adresse="Adr1")
+        Magasin.objects.create(nom="M2", adresse="Adr2")
 
     def test_list_magasins(self):
         url = reverse('magasin-list')
-        resp = self.client.get(url)
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = resp.json()
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.json()
         self.assertIsInstance(data, list)
         self.assertEqual(len(data), 2)
 
     def test_retrieve_magasin(self):
-        url = reverse('magasin-detail', args=[self.m1.id])
-        resp = self.client.get(url)
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(resp.json()['nom'], 'M1')
+        magasin = Magasin.objects.first()
+        url = reverse('magasin-detail', args=[magasin.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()['nom'], magasin.nom)
+
 
 class ProduitViewSetTest(APITestCase):
+    """Tests pour le ViewSet Produit"""
+
     def setUp(self):
         self.client = APIClient()
-        self.prod_url = reverse('produit-list')
+        self.url = reverse('produit-list')
 
-    def test_create_update_delete_produit(self):
-        resp = self.client.post(self.prod_url,
-                                {'nom': 'P1', 'categorie': 'Cat', 'prix': '12.50'},
-                                format='json')
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        prod_id = resp.json()['id']
-        detail = reverse('produit-detail', args=[prod_id])
-        resp2 = self.client.patch(detail, {'prix': '15.00'}, format='json')
-        self.assertEqual(resp2.status_code, status.HTTP_200_OK)
-        self.assertEqual(resp2.json()['prix'], '15.00')
-        resp3 = self.client.delete(detail)
-        self.assertEqual(resp3.status_code, status.HTTP_204_NO_CONTENT)
+    def test_create_update_delete(self):
+        # Création
+        payload = {'nom': 'P1', 'categorie': 'Cat', 'prix': '12.50'}
+        response = self.client.post(self.url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        produit_id = response.json()['id']
+
+        # Mise à jour
+        detail_url = reverse('produit-detail', args=[produit_id])
+        update_payload = {'prix': '15.00'}
+        response = self.client.patch(detail_url, update_payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()['prix'], '15.00')
+
+        # Suppression
+        response = self.client.delete(detail_url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
 
 class StockViewSetTest(APITestCase):
+    """Tests pour le ViewSet Stock"""
+
     def setUp(self):
         self.client = APIClient()
-        self.mag = Magasin.objects.create(nom='M1', adresse='Adr1')
-        self.prod = Produit.objects.create(nom='P2', categorie='C2', prix='5.00')
+        magasin = Magasin.objects.create(nom='M1', adresse='Adr1')
+        produit = Produit.objects.create(nom='P2', categorie='C2', prix='5.00')
         self.url = reverse('stock-list')
+        self.magasin = magasin
+        self.produit = produit
 
     def test_create_and_retrieve_stock(self):
-        resp = self.client.post(self.url,
-                                {'magasin': self.mag.id, 'produit': self.prod.id, 'quantite': 7},
-                                format='json')
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        stock_id = resp.json()['id']
-        detail = reverse('stock-detail', args=[stock_id])
-        resp2 = self.client.get(detail)
-        self.assertEqual(resp2.status_code, status.HTTP_200_OK)
-        self.assertEqual(resp2.json()['quantite'], 7)
+        payload = {
+            'magasin': self.magasin.id,
+            'produit': self.produit.id,
+            'quantite': 7,
+        }
+        response = self.client.post(self.url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        stock_id = response.json()['id']
+
+        detail_url = reverse('stock-detail', args=[stock_id])
+        response = self.client.get(detail_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()['quantite'], 7)
+
 
 class VenteViewSetTest(APITestCase):
+    """Tests pour le ViewSet Vente"""
+
     def setUp(self):
         self.client = APIClient()
-        self.mag = Magasin.objects.create(nom='M4', adresse='Adr4')
+        magasin = Magasin.objects.create(nom='M4', adresse='Adr4')
         self.url = reverse('vente-list')
+        self.magasin = magasin
 
     def test_create_and_list_vente(self):
-        resp = self.client.post(self.url, {'magasin': self.mag.id}, format='json')
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        vente_id = resp.json()['id']
-        resp2 = self.client.get(self.url)
-        self.assertEqual(resp2.status_code, status.HTTP_200_OK)
-        self.assertTrue(any(v['id'] == vente_id for v in resp2.json()))
+        # Création de la vente
+        payload = {'magasin': self.magasin.id}
+        response = self.client.post(self.url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        vente_id = response.json()['id']
+
+        # Listing
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.json()
+        self.assertTrue(any(item['id'] == vente_id for item in data))
+
 
 class LigneVenteViewSetTest(APITestCase):
+    """Tests pour le ViewSet LigneVente"""
+
     def setUp(self):
         self.client = APIClient()
-        self.mag = Magasin.objects.create(nom='M5', adresse='Adr5')
-        self.prod = Produit.objects.create(nom='P3', categorie='Cat3', prix='3.00')
-        vente = Venda = Vente.objects.create(magasin=self.mag)
+        magasin = Magasin.objects.create(nom='M5', adresse='Adr5')
+        produit = Produit.objects.create(nom='P3', categorie='Cat3', prix='3.00')
+        self.vente = Vente.objects.create(magasin=magasin)
         self.url = reverse('ligne-list')
+        self.produit = produit
 
     def test_create_and_list_ligne(self):
-        resp = self.client.post(self.url,
-                                {'vente': Vente.objects.first().id, 'produit': self.prod.id, 'quantite': 4},
-                                format='json')
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        lv_id = resp.json()['id']
-        resp2 = self.client.get(self.url)
-        self.assertTrue(any(l['id'] == lv_id for l in resp2.json()))
+        payload = {
+            'vente': self.vente.id,
+            'produit': self.produit.id,
+            'quantite': 4,
+        }
+        response = self.client.post(self.url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        ligne_id = response.json()['id']
+
+        response = self.client.get(self.url)
+        self.assertTrue(any(item['id'] == ligne_id for item in response.json()))
+
 
 class DemandeReapproViewSetTest(APITestCase):
+    """Tests pour le ViewSet DemandeReappro"""
+
     def setUp(self):
         self.client = APIClient()
-        self.mag = Magasin.objects.create(nom='M6', adresse='Adr6')
-        self.prod = Produit.objects.create(nom='P4', categorie='Cat4', prix='4.00')
+        magasin = Magasin.objects.create(nom='M6', adresse='Adr6')
+        produit = Produit.objects.create(nom='P4', categorie='Cat4', prix='4.00')
         self.url = reverse('demande-list')
+        self.magasin = magasin
+        self.produit = produit
 
     def test_create_and_list_demande(self):
-        resp = self.client.post(self.url,
-                                {'magasin': self.mag.id, 'produit': self.prod.id, 'quantite': 5},
-                                format='json')
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        demande_id = resp.json()['id']
-        resp2 = self.client.get(self.url)
-        self.assertTrue(any(d['id'] == demande_id for d in resp2.json()))
+        payload = {
+            'magasin': self.magasin.id,
+            'produit': self.produit.id,
+            'quantite': 5,
+        }
+        response = self.client.post(self.url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        demande_id = response.json()['id']
+
+        response = self.client.get(self.url)
+        self.assertTrue(any(item['id'] == demande_id for item in response.json()))

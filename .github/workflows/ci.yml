@@ -41,12 +41,13 @@ jobs:
       - name: Start containers
         run: docker-compose up -d
 
-      - name: Wait for DB to be healthy
+      - name: Wait for PostgreSQL to accept connections
         run: |
-          until [ "$(docker inspect --format='{{.State.Health.Status}}' my-postgres-3)" = "healthy" ]; do
-            echo "Waiting for PostgreSQL to be healthy..."
-            sleep 3
+          until pg_isready -h localhost -p 5433 -U myuser -d mydatabase; do
+            echo "Waiting for PostgreSQL to be ready…"
+            sleep 2
           done
+
 
       - name: Run tests (migrations + tests)
         run: docker-compose run --rm -e RUN_TESTS=true web
