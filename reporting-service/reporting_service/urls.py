@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.urls import path
 from reports.views import RapportVentesAPIView, DashboardAPIView
+from django_prometheus import exports
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -10,4 +12,6 @@ urlpatterns = [
 
     # UC3 – Visualiser les performances des magasins
     path('dashboard/', DashboardAPIView.as_view(), name='dashboard'),
+
+    path("metrics/", exports.ExportToDjangoView),
 ]

@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django_prometheus import exports
 from stocks.views import (
     StockMagasinAPIView, ReapproAPIView, TraitementDemandeReapproAPIView,
     DemandeReapproActionAPIView, DemandeReapproAPIView
@@ -35,5 +36,6 @@ urlpatterns = [
     
     # Page de demande de réapprovisionnement pour un employé - UC5 - Demander un réapprovisionnement
     path('api/stock/demande_reappro_utilisateur/<int:stock_id>/', DemandeReapproAPIView.as_view(), name='demande_reappro_utilisateur'),
+    path("metrics/", exports.ExportToDjangoView),
 
 ]

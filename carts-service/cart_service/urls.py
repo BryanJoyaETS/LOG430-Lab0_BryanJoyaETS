@@ -7,6 +7,7 @@ from carts.views import (
     TraiterRetourAPIView,
     HistoriqueTransactionsAPIView,
 )
+from django_prometheus import exports
 
 urlpatterns = [
     
@@ -41,4 +42,5 @@ urlpatterns = [
         HistoriqueTransactionsAPIView.as_view(),
         name='historique_transactions'
     ),
+    path("metrics/", exports.ExportToDjangoView),
 ]

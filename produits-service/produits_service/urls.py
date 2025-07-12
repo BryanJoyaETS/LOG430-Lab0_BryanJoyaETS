@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from produits.views import ListeProduitsAPIView, ModifierProduitAPIView
+from django_prometheus import exports
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,4 +25,5 @@ urlpatterns = [
     path('api/produits/list/', ListeProduitsAPIView.as_view(), name='liste_produits'),
     # Modifier un produit - UC4 - Modifier les informations d'un produit
     path('api/produits/<int:produit_id>/modifier/', ModifierProduitAPIView.as_view(), name='modifier_produit'),
+    path("metrics/", exports.ExportToDjangoView),
 ]
