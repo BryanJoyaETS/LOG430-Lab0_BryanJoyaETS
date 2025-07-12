@@ -68,13 +68,21 @@ services:
         - "8000"
       depends_on:
         - db
-
-
-
-
-
-
-
+  accounts:
+    build: ./accounts-service/
+    command: >
+      sh -c "python manage.py makemigrations &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_DB=mydatabase
+      - POSTGRES_USER=myuser
+      - POSTGRES_PASSWORD=mypassword
+    expose:
+      - "8000"
+    depends_on:
+      - db
 
   db:
     image: postgres:15
@@ -106,9 +114,6 @@ services:
       else
          python laboratoire_bj/manage.py runserver 0.0.0.0:8000;
       fi"
-    #container_name: lab3-container-bryanjoya
-    # ports:
-    #   - "8000:8000"
     environment:
       - POSTGRES_HOST=db
       - POSTGRES_DB=mydatabase
@@ -166,7 +171,6 @@ services:
       - "6379:6379"
     expose:
       - "6379"
-
 
 volumes:
   pgdata-3:

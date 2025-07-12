@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Créer un compte – Mon Application</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 40px;
+      text-align: center;
+    }
+    .card {
+      background: #fff;
+      display: inline-block;
+      padding: 20px 30px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      max-width: 400px;
+      width: 100%;
+    }
+    form p {
+      margin: 12px 0;
+      text-align: left;
+    }
+    form input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .btn {
+      background: #007bff;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .btn:hover {
+      background: #0056b3;
+    }
+    .back {
+      display: block;
+      margin-top: 20px;
+      color: #007bff;
+      text-decoration: none;
+    }
+    .back:hover {
+      text-decoration: underline;
+    }
+    .errorlist {
+      color: red;
+      margin-bottom: 10px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Créer un compte</h1>
+    <form method="post" action="{% url 'register' %}">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      {{ form.username.errors }}
+      <p>
+        <label for="{{ form.username.id_for_label }}">Username:</label>
+        {{ form.username }}
+      </p>
+      {{ form.email.errors }}
+      <p>
+        <label for="{{ form.email.id_for_label }}">Email:</label>
+        {{ form.email }}
+      </p>
+      {{ form.password1.errors }}
+      <p>
+        <label for="{{ form.password1.id_for_label }}">Mot de passe:</label>
+        {{ form.password1 }}
+      </p>
+      {{ form.password2.errors }}
+      <p>
+        <label for="{{ form.password2.id_for_label }}">Confirmation mot de passe:</label>
+        {{ form.password2 }}
+      </p>
+      <button type="submit" class="btn">S'inscrire</button>
+    </form>
+    <a href="/" class="back">← Retour à l'accueil</a>
+  </div>
+</body>
+</html>
