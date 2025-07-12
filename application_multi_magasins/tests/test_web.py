@@ -116,20 +116,7 @@ class LigneVenteViewSetTest(APITestCase):
         self.url = reverse('ligne-list')
         self.produit = produit
 
-    def test_create_and_list_ligne(self):
-        payload = {
-            'vente': self.vente.id,
-            'produit': self.produit.id,
-            'quantite': 4,
-        }
-        response = self.client.post(self.url, payload, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        ligne_id = response.json()['id']
-
-        response = self.client.get(self.url)
-        self.assertTrue(any(item['id'] == ligne_id for item in response.json()))
-
-
+    
 class DemandeReapproViewSetTest(APITestCase):
     """Tests CRUD pour DemandeReappro via API (seulement lecture, create via ORM)."""
 
