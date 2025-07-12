@@ -1,6 +1,7 @@
 """
 Tests pour les ViewSets de l'application application_multi_magasins
 """
+# pylint: disable=no-member
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
