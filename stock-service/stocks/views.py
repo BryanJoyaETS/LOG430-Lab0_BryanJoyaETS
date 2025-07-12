@@ -1,191 +1,150 @@
 # pylint: disable=no-member, import-error, too-few-public-methods
 import logging
+import requests
+from django.conf import settings
+from django.contrib import messages
+from django.shortcuts import render, get_object_or_404
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 
 logger = logging.getLogger(__name__)
 
+MONOLITHE_BASE_URL = 'http://web:8000/api/monolithe'
 
-from django.contrib import messages
-from django.shortcuts import get_object_or_404
-from rest_framework import status, viewsets
-from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
-from django.core.cache import cache
-from stocks.models import Magasin, Stock, DemandeReappro
-from stocks.serializers import MagasinSerializer, StockSerializer
-
-@method_decorator(cache_page(60 * 5), name='dispatch')
 class StockMagasinAPIView(APIView):
-    """API pour afficher le stock d'un magasin."""
+    """API pour afficher le stock d'un magasin (proxy vers le monolithe)."""
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
     template_name = 'stock_magasin.html'
 
     def get(self, request, magasin_id, response_format=None):
-        """GET: Retourne le stock d'un magasin."""
-        magasin = get_object_or_404(Magasin, id=magasin_id)
-        stocks = Stock.objects.filter(magasin=magasin).select_related('produit')
-        central_magasin = get_object_or_404(Magasin, nom="CENTRE_LOGISTIQUE")
-        central_stocks = Stock.objects.filter(magasin=central_magasin).select_related('produit')
-        if response_format == 'json' or request.accepted_renderer.format == 'json':
-            return Response({
-                'magasin': MagasinSerializer(magasin).data,
-                'stocks': StockSerializer(stocks, many=True).data,
-                'central_stocks': StockSerializer(central_stocks, many=True).data,
-            })
-        context = {
+        base = MONOLITHE_BASE_URL
+        # 1. Récupérer le magasin
+        resp_mag = requests.get(f"{base}/magasins/{magasin_id}/")
+        if resp_mag.status_code != 200:
+            return Response({'error': 'Magasin introuvable'}, status=resp_mag.status_code)
+        magasin = resp_mag.json()
+
+        # 2. Récupérer tous les stocks puis filtrer pour ne garder que ceux du magasin_id
+        resp_stocks = requests.get(f"{base}/stocks/", params={'magasin': magasin_id})
+        if resp_stocks.status_code != 200:
+            return Response({'error': 'Impossible de récupérer les stocks'}, status=resp_stocks.status_code)
+        stocks = [
+            s for s in resp_stocks.json()
+            if s.get('magasin', {}).get('id') == magasin_id
+        ]
+
+        # 3. Récupérer les stocks du centre logistique
+        resp_centre = requests.get(f"{base}/magasins/", params={'search': 'CENTRE_LOGISTIQUE'})
+        central_stocks = []
+        if resp_centre.status_code == 200 and resp_centre.json():
+            centre_id = resp_centre.json()[0]['id']
+            resp_cstocks = requests.get(f"{base}/stocks/", params={'magasin': centre_id})
+            if resp_cstocks.status_code == 200:
+                central_stocks = resp_cstocks.json()
+
+        payload = {
             'magasin': magasin,
             'stocks': stocks,
             'central_stocks': central_stocks,
         }
-        return Response(context)
+        if response_format == 'json' or request.accepted_renderer.format == 'json':
+            return Response(payload)
+        return Response(payload, template_name=self.template_name)
 
 
 class ReapproAPIView(APIView):
-    """API GET pour la page de réapprovisionnement."""
+    """API GET pour la page de réapprovisionnement (proxy vers le monolithe)."""
     renderer_classes = [JSONRenderer, TemplateHTMLRenderer]
     template_name = 'demande_reappro.html'
 
     def get(self, request, stock_id, response_format=None):
-        """GET: Retourne les infos de stock pour réapprovisionnement."""
-        stock = get_object_or_404(Stock, id=stock_id)
-        try:
-            central_magasin = Magasin.objects.get(nom="CENTRE_LOGISTIQUE")
-        except Magasin.DoesNotExist:
-            central_stock_qty = 0
-        else:
-            try:
-                central_stock_obj = Stock.objects.get(magasin=central_magasin, produit=stock.produit)
-                central_stock_qty = central_stock_obj.quantite
-            except Stock.DoesNotExist:
-                central_stock_qty = 0
+        base = MONOLITHE_BASE_URL
+        # Récupérer le stock local
+        resp_stock = requests.get(f"{base}/stocks/{stock_id}/")
+        if resp_stock.status_code != 200:
+            return Response({'error': 'Stock introuvable'}, status=resp_stock.status_code)
+        stock = resp_stock.json()
+
+        # Récupérer la quantité centrale pour ce produit
+        resp_centre = requests.get(f"{base}/magasins/", params={'search': 'CENTRE_LOGISTIQUE'})
+        central_qty = 0
+        if resp_centre.status_code == 200 and resp_centre.json():
+            centre_id = resp_centre.json()[0]['id']
+            # Utiliser uniquement l'ID du produit
+            produit_id = stock['produit']['id']
+            resp_cstock = requests.get(
+                f"{base}/stocks/",
+                params={'magasin': centre_id, 'produit': produit_id}
+            )
+            if resp_cstock.status_code == 200 and resp_cstock.json():
+                central_qty = resp_cstock.json()[0]['quantite']
+
         data = {
-            'produit': {
-                'id': stock.produit.id,
-                'nom': stock.produit.nom,
-            },
-            'magasin': {
-                'id': stock.magasin.id,
-                'nom': stock.magasin.nom,
-            },
-            'stock_local': stock.quantite,
-            'stock_central': central_stock_qty,
+            'produit': stock['produit'],
+            'magasin': stock['magasin'],
+            'stock_local': stock['quantite'],
+            'stock_central': central_qty,
         }
-        return Response(data)
+        if response_format == 'json' or request.accepted_renderer.format == 'json':
+            return Response(data)
+        return Response(data, template_name=self.template_name)
 
 
 class DemandeReapproAPIView(APIView):
-    """API POST pour enregistrer une demande de réapprovisionnement."""
+    """API POST pour enregistrer une demande de réapprovisionnement (proxy)."""
     renderer_classes = [JSONRenderer, TemplateHTMLRenderer]
-    template_name = "demande_reappro_utilisateur.html"
+    template_name = 'demande_reappro_utilisateur.html'
 
     def post(self, request, stock_id, response_format=None):
-        """POST: Crée une demande de réapprovisionnement."""
-        stock = get_object_or_404(Stock, id=stock_id)
+        base = MONOLITHE_BASE_URL
+        # Vérifier le stock local
+        resp_stock = requests.get(f"{base}/stocks/{stock_id}/")
+        if resp_stock.status_code != 200:
+            return Response({'error': 'Stock introuvable'}, status=resp_stock.status_code)
+        stock = resp_stock.json()
+
+        # Créer la demande via le monolithe (ID uniquement)
         quantite = request.data.get('quantite')
-        if quantite is None:
-            return Response({'error': 'Quantité non spécifiée'}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            quantite = int(quantite)
-            if quantite < 1:
-                raise ValueError("La quantité doit être au moins 1.")
-        except (ValueError, TypeError):
-            return Response({'error': 'Quantité invalide'}, status=status.HTTP_400_BAD_REQUEST)
-        demande = DemandeReappro.objects.create(
-            magasin=stock.magasin,
-            produit=stock.produit,
-            quantite=quantite,
-            statut='pending'
+        magasin_id = stock['magasin']['id']
+        produit_id = stock['produit']['id']
+        resp = requests.post(
+            f"{base}/demandes/",
+            json={
+                'magasin': magasin_id,
+                'produit': produit_id,
+                'quantite': quantite
+            }
         )
-        data = {
-            'message': 'Demande de réapprovisionnement soumise avec succès.',
-            'magasin_id': stock.magasin.id
-        }
-        return Response(data, template_name=self.template_name, status=status.HTTP_201_CREATED)
+        if resp.status_code == status.HTTP_201_CREATED:
+            return Response(resp.json(), template_name=self.template_name, status=status.HTTP_201_CREATED)
+        return Response(resp.json(), status=resp.status_code)
 
 
 class TraitementDemandeReapproAPIView(APIView):
-    """API pour traiter les demandes de réapprovisionnement."""
+    """API GET pour traiter les demandes (proxy pour liste pending)."""
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
 
-    def get_template_names(self):
-        """Retourne la liste des templates possibles."""
-        return ["traiter_demande_reappro.html"]
-
     def get(self, request, response_format=None):
-        """GET: Liste les demandes en attente."""
-        demandes = DemandeReappro.objects.filter(statut="pending") \
-            .select_related("magasin", "produit")
-        context = {"demandes": demandes}
-        return Response(context)
-
-    def post(self, request, response_format=None):
-        """POST: Traite une demande (approve/refuse)."""
-        demande_id = request.data.get("demande_id")
-        action = request.data.get("action")
-        demande = get_object_or_404(DemandeReappro, id=demande_id)
-        if action == "approve":
-            demande.statut = "approved"
-            message_text = "Demande approuvée avec succès."
-        elif action == "refuse":
-            demande.statut = "refused"
-            message_text = "Demande refusée avec succès."
-        else:
-            message_text = "Action invalide."
-            messages.error(request, message_text)
-            demandes = DemandeReappro.objects.filter(statut="pending") \
-                .select_related("magasin", "produit")
-            return Response({"demandes": demandes})
-        demande.save()
-        messages.success(request, message_text)
-        demandes = DemandeReappro.objects.filter(statut="pending") \
-            .select_related("magasin", "produit")
-        context = {"demandes": demandes}
-        return Response(context)
+        base = MONOLITHE_BASE_URL
+        resp = requests.get(f"{base}/demandes/", params={'statut': 'pending'})
+        if resp.status_code != 200:
+            return Response({'error': 'Impossible de récupérer les demandes'}, status=resp.status_code)
+        demandes = resp.json()
+        context = {'demandes': demandes}
+        return Response(context, template_name='traiter_demande_reappro.html')
 
 
 class DemandeReapproActionAPIView(APIView):
-    """
-    POST  /api/demandes/<int:demande_id>/action/
-    Corps JSON attendu: { "action": "approve" } ou { "action": "refuse" }
-    """
+    """API POST pour approuver/refuser une demande (proxy)."""
     def post(self, request, demande_id, response_format=None):
-        """POST: Approuve ou refuse une demande de réapprovisionnement."""
-        demande = get_object_or_404(DemandeReappro, id=demande_id)
-        action = request.data.get("action")
-        if action not in ['approve', 'refuse']:
-            return Response({"error": "Action invalide."}, status=status.HTTP_400_BAD_REQUEST)
-        if action == 'approve':
-            central_magasin = get_object_or_404(Magasin, nom="CENTRE_LOGISTIQUE")
-            try:
-                central_stock = Stock.objects.get(magasin=central_magasin, produit=demande.produit)
-            except Stock.DoesNotExist:
-                return Response(
-                    {"error": "Stock central indisponible pour ce produit."},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            if central_stock.quantite < demande.quantite:
-                return Response(
-                    {"error": "Stock central insuffisant pour cette demande."},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            central_stock.quantite -= demande.quantite
-            central_stock.save()
-            try:
-                local_stock = Stock.objects.get(magasin=demande.magasin, produit=demande.produit)
-            except Stock.DoesNotExist:
-                local_stock = Stock.objects.create(
-                    magasin=demande.magasin,
-                    produit=demande.produit,
-                    quantite=0
-                )
-            local_stock.quantite += demande.quantite
-            local_stock.save()
-            message_text = "Demande approuvée, stock transféré du centre logistique avec succès."
-        else:  
-            message_text = "Demande refusée avec succès."
-        demande.delete()
-        return Response({"message": message_text}, status=status.HTTP_200_OK)
-
-
+        base = MONOLITHE_BASE_URL
+        action = request.data.get('action')
+        resp = requests.post(
+            f"{base}/demandes/{demande_id}/action/",
+            json={'action': action}
+        )
+        return Response(resp.json(), status=resp.status_code)
