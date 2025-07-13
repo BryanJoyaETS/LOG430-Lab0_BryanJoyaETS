@@ -20,7 +20,7 @@ from django.core.cache import cache
 from reports.models import (
     Magasin, Stock, Vente, LigneVente
 )
-
+@method_decorator(cache_page(60 * 5), name='dispatch')
 class RapportVentesAPIView(APIView):
     """API pour le rapport des ventes."""
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]

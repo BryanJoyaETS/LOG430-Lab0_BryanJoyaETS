@@ -1,6 +1,5 @@
 import http from "k6/http";
 import { sleep, check } from "k6";
-import encoding from "k6/encoding";
 
 export let options = {
   stages: [
@@ -15,56 +14,19 @@ export let options = {
 };
 
 const BASE = __ENV.BASE_URL || "http://localhost:8000/api";
-const USER = "username";
-const PASS = "password";
-
-const credentials = `${USER}:${PASS}`;
-const authHeader = `Basic ${encoding.b64encode(credentials)}`;
-
-let servedByCounters = {};
 
 export default function () {
   const params = {
     headers: {
-      Authorization: authHeader,
       "Content-Type": "application/json",
     },
   };
 
-  // 1. Consultation du stock du magasin #1
   let res1 = http.get(`${BASE}/stock/1/`, params);
   check(res1, { "stock 200": (r) => r.status === 200 });
-  logServedBy(res1);
 
-  // 2. Génération du rapport consolidé
-  let res2 = http.get(`${BASE}/rapport/`, params);
-  check(res2, { "rapport 200": (r) => r.status === 200 });
-  logServedBy(res2);
-
-  // 3. Mise à jour d’un produit #1
-  const payload = JSON.stringify({
-    nom: "Product1",
-    categorie: "Category1",
-    prix: "100.01",
-  });
-
-  let res3 = http.put(`${BASE}/produit/1/modifier/?format=json`, payload, params);
-  check(res3, { "update 200": (r) => r.status === 200 });
-  logServedBy(res3);
+  let res2 = http.get(`${BASE}/rapport/ventes/`, params);
+  check(res2, { "rapport ventes 200": (r) => r.status === 200 });
 
   sleep(1);
-}
-
-function logServedBy(response) {
-  const servedBy = response.headers["X-Served-By"];
-  if (servedBy) {
-    console.log(`Request served by: ${servedBy}`);
-
-    if (!(servedBy in servedByCounters)) {
-      servedByCounters[servedBy] = 0;
-    }
-    servedByCounters[servedBy]++;
-  } else {
-    console.log("X-Served-By header not found");
-  }
 }

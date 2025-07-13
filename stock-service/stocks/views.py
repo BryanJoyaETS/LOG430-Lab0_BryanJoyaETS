@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 MONOLITHE_BASE_URL = 'http://web:8000/api/monolithe'
 
+@method_decorator(cache_page(60 * 5), name='dispatch')
 class StockMagasinAPIView(APIView):
     """API pour afficher le stock d'un magasin (proxy vers le monolithe)."""
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
@@ -22,13 +23,11 @@ class StockMagasinAPIView(APIView):
 
     def get(self, request, magasin_id, response_format=None):
         base = MONOLITHE_BASE_URL
-        # 1. Récupérer le magasin
         resp_mag = requests.get(f"{base}/magasins/{magasin_id}/")
         if resp_mag.status_code != 200:
             return Response({'error': 'Magasin introuvable'}, status=resp_mag.status_code)
         magasin = resp_mag.json()
 
-        # 2. Récupérer tous les stocks puis filtrer pour ne garder que ceux du magasin_id
         resp_stocks = requests.get(f"{base}/stocks/", params={'magasin': magasin_id})
         if resp_stocks.status_code != 200:
             return Response({'error': 'Impossible de récupérer les stocks'}, status=resp_stocks.status_code)
@@ -37,7 +36,6 @@ class StockMagasinAPIView(APIView):
             if s.get('magasin', {}).get('id') == magasin_id
         ]
 
-        # 3. Récupérer les stocks du centre logistique
         resp_centre = requests.get(f"{base}/magasins/", params={'search': 'CENTRE_LOGISTIQUE'})
         central_stocks = []
         if resp_centre.status_code == 200 and resp_centre.json():
@@ -63,18 +61,15 @@ class ReapproAPIView(APIView):
 
     def get(self, request, stock_id, response_format=None):
         base = MONOLITHE_BASE_URL
-        # Récupérer le stock local
         resp_stock = requests.get(f"{base}/stocks/{stock_id}/")
         if resp_stock.status_code != 200:
             return Response({'error': 'Stock introuvable'}, status=resp_stock.status_code)
         stock = resp_stock.json()
 
-        # Récupérer la quantité centrale pour ce produit
         resp_centre = requests.get(f"{base}/magasins/", params={'search': 'CENTRE_LOGISTIQUE'})
         central_qty = 0
         if resp_centre.status_code == 200 and resp_centre.json():
             centre_id = resp_centre.json()[0]['id']
-            # Utiliser uniquement l'ID du produit
             produit_id = stock['produit']['id']
             resp_cstock = requests.get(
                 f"{base}/stocks/",
@@ -101,13 +96,11 @@ class DemandeReapproAPIView(APIView):
 
     def post(self, request, stock_id, response_format=None):
         base = MONOLITHE_BASE_URL
-        # Vérifier le stock local
         resp_stock = requests.get(f"{base}/stocks/{stock_id}/")
         if resp_stock.status_code != 200:
             return Response({'error': 'Stock introuvable'}, status=resp_stock.status_code)
         stock = resp_stock.json()
 
-        # Créer la demande via le monolithe (ID uniquement)
         quantite = request.data.get('quantite')
         magasin_id = stock['magasin']['id']
         produit_id = stock['produit']['id']
