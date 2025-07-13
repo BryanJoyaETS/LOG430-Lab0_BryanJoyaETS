@@ -1,0 +1,188 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "API Carts Service",
+    "description": "Documentation de l'API REST",
+    "version": "v1"
+  },
+  "host": "localhost",
+  "schemes": [
+    "http"
+  ],
+  "basePath": "/api",
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "securityDefinitions": {
+    "Basic": {
+      "type": "basic"
+    }
+  },
+  "security": [
+    {
+      "Basic": []
+    }
+  ],
+  "paths": {
+    "/caisse/{magasin_id}/": {
+      "get": {
+        "operationId": "caisse_read",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "caisse"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "magasin_id",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    "/caisse/{magasin_id}/historique/": {
+      "get": {
+        "operationId": "caisse_historique_list",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "caisse"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "magasin_id",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    "/caisse/{magasin_id}/recherche/": {
+      "get": {
+        "operationId": "caisse_recherche_list",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "caisse"
+        ]
+      },
+      "post": {
+        "operationId": "caisse_recherche_create",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "caisse"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "magasin_id",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    "/caisse/{magasin_id}/retour/": {
+      "get": {
+        "operationId": "caisse_retour_list",
+        "description": "Affiche le formulaire HTML de retour de vente.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "caisse"
+        ]
+      },
+      "post": {
+        "operationId": "caisse_retour_create",
+        "description": "Traite la soumission du formulaire (HTML) ou du JSON (API).",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "caisse"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "magasin_id",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    "/caisse/{magasin_id}/vente/": {
+      "get": {
+        "operationId": "caisse_vente_list",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "caisse"
+        ]
+      },
+      "post": {
+        "operationId": "caisse_vente_create",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "caisse"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "magasin_id",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    }
+  },
+  "definitions": {
+
+  }
+}
