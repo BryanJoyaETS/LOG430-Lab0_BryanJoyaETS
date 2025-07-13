@@ -1,0 +1,142 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "API Stock Service",
+    "description": "Documentation de l'API REST",
+    "version": "v1"
+  },
+  "host": "localhost",
+  "schemes": [
+    "http"
+  ],
+  "basePath": "/api",
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "securityDefinitions": {
+    "Basic": {
+      "type": "basic"
+    }
+  },
+  "security": [
+    {
+      "Basic": []
+    }
+  ],
+  "paths": {
+    "/stock/demande/list/": {
+      "get": {
+        "operationId": "stock_demande_list_list",
+        "description": "API GET pour traiter les demandes (proxy pour liste pending).",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "stock"
+        ]
+      },
+      "parameters": []
+    },
+    "/stock/demande_reappro_utilisateur/{stock_id}/": {
+      "post": {
+        "operationId": "stock_demande_reappro_utilisateur_create",
+        "description": "API POST pour enregistrer une demande de réapprovisionnement (proxy).",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "stock"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "stock_id",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    "/stock/demandes/{demande_id}/action/": {
+      "post": {
+        "operationId": "stock_demandes_action_create",
+        "description": "API POST pour approuver/refuser une demande (proxy).",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "stock"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "demande_id",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    "/stock/reappro/{stock_id}/": {
+      "get": {
+        "operationId": "stock_reappro_read",
+        "description": "API GET pour la page de réapprovisionnement (proxy vers le monolithe).",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "stock"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "stock_id",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    "/stock/{magasin_id}/": {
+      "get": {
+        "operationId": "stock_read",
+        "description": "API pour afficher le stock d'un magasin (proxy vers le monolithe).",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "stock"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "magasin_id",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    }
+  },
+  "definitions": {
+
+  }
+}

@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'reports',
     'django_prometheus',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [

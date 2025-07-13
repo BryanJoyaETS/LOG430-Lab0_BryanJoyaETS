@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'carts',
     'rest_framework',
     'django_prometheus',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [

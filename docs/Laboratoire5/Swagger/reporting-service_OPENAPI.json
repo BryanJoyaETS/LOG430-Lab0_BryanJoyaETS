@@ -1,0 +1,66 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "API Reporting Service",
+    "description": "Documentation de l'API REST",
+    "version": "v1"
+  },
+  "host": "localhost",
+  "schemes": [
+    "http"
+  ],
+  "basePath": "/",
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "securityDefinitions": {
+    "Basic": {
+      "type": "basic"
+    }
+  },
+  "security": [
+    {
+      "Basic": []
+    }
+  ],
+  "paths": {
+    "/dashboard/": {
+      "get": {
+        "operationId": "dashboard_list",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "dashboard"
+        ]
+      },
+      "parameters": []
+    },
+    "/ventes/": {
+      "get": {
+        "operationId": "ventes_list",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "ventes"
+        ]
+      },
+      "parameters": []
+    }
+  },
+  "definitions": {
+
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "API Produits Service",
+    "description": "Documentation de l'API REST",
+    "version": "v1"
+  },
+  "host": "localhost",
+  "schemes": [
+    "http"
+  ],
+  "basePath": "/api",
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "securityDefinitions": {
+    "Basic": {
+      "type": "basic"
+    }
+  },
+  "security": [
+    {
+      "Basic": []
+    }
+  ],
+  "paths": {
+    "/produits/list/": {
+      "get": {
+        "operationId": "produits_list_list",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "produits"
+        ]
+      },
+      "parameters": []
+    },
+    "/produits/{produit_id}/modifier/": {
+      "get": {
+        "operationId": "produits_modifier_list",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "produits"
+        ]
+      },
+      "put": {
+        "operationId": "produits_modifier_update",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "produits"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "produit_id",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    }
+  },
+  "definitions": {
+
+  }
+}

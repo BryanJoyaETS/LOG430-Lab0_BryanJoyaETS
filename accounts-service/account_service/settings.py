@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'accounts',
     'rest_framework',
     'django_prometheus',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [

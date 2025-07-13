@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'stocks',
     'django_prometheus',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
