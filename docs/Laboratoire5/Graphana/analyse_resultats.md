@@ -54,3 +54,35 @@ k6 run k6/load-test.js
 
 running (2m00.2s), 00/50 VUs, 3106 complete and 0 interrupted iterations
 default ✓ [======================================] 00/50 VUs  2m0s
+
+
+| Mesure                 | Avant (monolithe + LB)                                             | Après (micro‑services + LB)                                        |
+|------------------------|---------------------------------------------------------------------|--------------------------------------------------------------------|
+| **p95 latence**        | ~ 7 010 ms (seuil visé p95 < 500 ms non atteint)                   | ~ 18 ms (seuil p95 < 20 000 ms largement respecté)                 |
+| **Latence moyenne**    | ~ 6 290 ms                                                          | ~ 8 ms                                                             |
+| **RPS (débit)**        | ~ 2,98 req/s                                                        | ~ 51,6 req/s                                                       |
+| **Taux d’erreur**      | 0 %                                                                 | 0 %                                                                |
+| **VU max**             | 20                                                                  | 50                                                                 |
+| **Itérations complètes** | 307 (environ 1 min)                                               | 6 212 (environ 2 min)                                             |
+
+---
+
+### 1. Avant (Monolithe + Load Balancer Nginx)
+- **Configuration** : une unique instance Django servie derrière Nginx en round‑robin (1 réplique).  
+- **Résultats k6** :  
+  - 20 VUs simulés → 0 % d’erreur  
+  - p95 ≃ 7 s, RPS ≃ 3 req/s  
+- **Limites** :  
+  - Goulot unique (une seule application)  
+  - Absence de cache  
+  - Charge CPU/mémoire saturée  
+
+### 2. Après (Micro‑services + Load Balancer Nginx + Cache)
+- **Configuration** :  
+  - 5 services conteneurisés (Produits, Stocks, Carts, Accounts, Reporting)  
+  - **Redis** pour le cache  
+  - **Nginx** répartissant la charge sur les services  
+- **Résultats k6** :  
+  - Jusqu’à 50 VUs → 0 % d’erreur  
+  - p95 ≃ 18 ms, latence moyenne ≃ 8 ms  
+  - RPS ≃ 51 req/s  
