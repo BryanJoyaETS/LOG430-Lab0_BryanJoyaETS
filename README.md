@@ -3,7 +3,7 @@
 ## Laboratoire 5 — Passage à une architecture microservices avec API Gateway et Observabilité
 
 > **Note :** Le fichier de documentation principal se trouve dans  
-> [`docs/Laboratoire5/README.md`](../Laboratoire5/README.md)
+> [`docs/Laboratoire5/README.md`](docs/Laboratoire5/README.md)
 
 ---
 
