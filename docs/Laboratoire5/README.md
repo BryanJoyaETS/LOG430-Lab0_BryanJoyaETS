@@ -68,10 +68,6 @@ Mon scraping Prometheus :
 
 Les targets : [http://10.194.32.198:9090/targets](http://10.194.32.198:9090/targets)
 
-Résultats de mesure Graphana : 
-
-[`docs/Laboratoire5/Graphana/analyse_resultats.md`](../Laboratoire5/Graphana/analyse_resultats.md)
-
 ADRs : 
 
 [`docs/Laboratoire5/ADR`](../Laboratoire5/ADR/001.md) ainsi que les autres dans le même dossier
