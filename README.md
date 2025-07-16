@@ -70,11 +70,11 @@ Les targets : [http://10.194.32.198:9090/targets](http://10.194.32.198:9090/targ
 
 Résultats de mesure Graphana : 
 
-[`docs/Laboratoire5/Graphana/analyse_resultats.md`](../Laboratoire5/Graphana/analyse_resultats.md)
+[`docs/Laboratoire5/Graphana/analyse_resultats.md`](/docs/Laboratoire5/Graphana/analyse_resultats.md)
 
 ADRs : 
 
-[`docs/Laboratoire5/ADR`](../Laboratoire5/ADR)
+[`docs/Laboratoire5/ADR`](/docs/Laboratoire5/ADR/)
 
 
 ---
@@ -96,5 +96,3 @@ ADRs :
   `git clone` https://github.com/BryanJoyaETS/LOG430-Lab0_BryanJoyaETS/releases/tag/Lab5
 
 ---
-
-## Documentation technique
