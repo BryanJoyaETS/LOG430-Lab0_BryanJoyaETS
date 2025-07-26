@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 from rest_framework import status
 
-from .models import Magasin, Stock, Vente, LigneVente, Cart
+from .models import Magasin, Stock, Vente, LigneVente, Cart, ServiceEvent
 from .serializers import (MagasinSerializer, StockSerializer,
                            VenteSerializer, LigneVenteSerializer, CartSerializer)
 
@@ -204,29 +204,59 @@ _cache = {}
 
 class LockCartAPIView(APIView):
     def post(self, request, cart_id):
-        key = _idempotent(request, "lock")
+        corr = request.headers.get("Idempotency-Key", "")
+        key  = _idempotent(request, "lock")
         if key in _cache:
-            return Response(_cache[key])              
+            return Response(_cache[key], status=200)
 
-        cart = get_object_or_404(Cart, id=cart_id)
-        if cart.status != "OPEN":
-            return Response({"detail": "Cart déjà verrouillé"},
-                            status=status.HTTP_409_CONFLICT)
+        try:
+            with transaction.atomic():
+                cart = get_object_or_404(Cart.objects.select_for_update(), id=cart_id)
+                # Idempotence "état" : si déjà LOCKED → 200 + état courant
+                if cart.status == "LOCKED":
+                    data = CartSerializer(cart).data
+                    _cache[key] = data
+                    log_event("LOCK_CART", ServiceEvent.Outcome.SUCCESS, corr, {"cart_id": str(cart_id), "already": True})
+                    return Response(data, status=200)
 
-        cart.status = "LOCKED"
-        cart.save()
-        data = CartSerializer(cart).data
-        _cache[key] = data
-        return Response(data, status=200)
+                cart.status = "LOCKED"
+                cart.save()
+
+            data = CartSerializer(cart).data
+            _cache[key] = data
+            log_event("LOCK_CART", ServiceEvent.Outcome.SUCCESS, corr, {"cart_id": str(cart_id)})
+            return Response(data, status=200)
+
+        except Exception as e:
+            log_event("LOCK_CART", ServiceEvent.Outcome.FAILURE, corr, {"cart_id": str(cart_id), "error": str(e)})
+            raise
 
 class UnlockCartAPIView(APIView):
     def post(self, request, cart_id):
-        key = _idempotent(request, "unlock")
+        corr = request.headers.get("Idempotency-Key", "")
+        key  = _idempotent(request, "unlock")
         if key in _cache:
             return Response(status=204)
 
-        cart = get_object_or_404(Cart, id=cart_id)
-        cart.status = "OPEN"
-        cart.save()
-        _cache[key] = True
-        return Response(status=204)
+        try:
+            with transaction.atomic():
+                cart = get_object_or_404(Cart.objects.select_for_update(), id=cart_id)
+                if cart.status != "OPEN":
+                    cart.status = "OPEN"
+                    cart.save()
+
+            _cache[key] = True
+            log_event("UNLOCK_CART", ServiceEvent.Outcome.SUCCESS, corr, {"cart_id": str(cart_id)})
+            return Response(status=204)
+
+        except Exception as e:
+            log_event("UNLOCK_CART", ServiceEvent.Outcome.FAILURE, corr, {"cart_id": str(cart_id), "error": str(e)})
+            raise
+
+def log_event(action: str, outcome: str, correlation_id: str = "", detail: dict | None = None):
+    ServiceEvent.objects.create(
+        action=action,
+        outcome=outcome,
+        correlation_id=correlation_id or "",
+        detail=detail or {},
+    )

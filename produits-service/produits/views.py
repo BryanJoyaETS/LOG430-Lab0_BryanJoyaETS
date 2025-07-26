@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.core.cache import cache
-from .models import Vente, LigneVente
+from .models import Vente, LigneVente, ServiceEvent
 from .serializers import VenteCreateSerializer
 
 from produits.models import (
@@ -71,35 +71,56 @@ _cache = {}
 
 class CreateVenteAPIView(APIView):
     def post(self, request):
-        idem = request.headers.get("Idempotency-Key")
-        if idem in _cache:
-            return Response(_cache[idem], status=201)
+        corr = request.headers.get("Idempotency-Key", "")
+        if corr and corr in _cache:
+            return Response(_cache[corr], status=201)
+        try:
+            ser = VenteCreateSerializer(data=request.data)
+            ser.is_valid(raise_exception=True)
+            data = ser.validated_data
 
-        ser = VenteCreateSerializer(data=request.data)
-        ser.is_valid(raise_exception=True)
-        data = ser.validated_data
+            with transaction.atomic():
+                vente = Vente.objects.create(magasin_id=data["magasin_id"])
+                for l in data["lignes"]:
+                    LigneVente.objects.create(
+                        vente=vente,
+                        produit_id=l["produit_id"],
+                        quantite=l["quantite"],
+                        prix_unitaire=l["prix_unit"],  
+                    )
 
-        with transaction.atomic():
-            vente = Vente.objects.create(magasin_id=data["magasin_id"])
-            for l in data["lignes"]:
-                LigneVente.objects.create(
-                    vente=vente, produit_id=l["produit_id"],
-                    quantite=l["quantite"], prix_unitaire=l["prix_unit"]
-                )
+            resp = {"id": vente.id} 
+            if corr:
+                _cache[corr] = resp
+            log_event("CREATE_VENTE", ServiceEvent.Outcome.SUCCESS, corr, {"vente_id": vente.id})
+            return Response(resp, status=201)
 
-        resp = {"id": str(vente.id)}
-        _cache[idem] = resp
-        return Response(resp, status=201)
+        except Exception as e:
+            log_event("CREATE_VENTE", ServiceEvent.Outcome.FAILURE, corr, {"error": str(e), "payload": request.data})
+            raise
 
 class DeleteVenteAPIView(APIView):
     def delete(self, request, vente_id):
-        idem = request.headers.get("Idempotency-Key") + "del"
-        if idem in _cache:
+        corr = request.headers.get("Idempotency-Key", "") + "del"
+        if corr in _cache:
+            return Response(status=204)
+        try:
+            v = Vente.objects.filter(id=vente_id, est_retournee=False).first()
+            if v:
+                v.est_retournee = True
+                v.save()
+            _cache[corr] = True
+            log_event("DELETE_VENTE", ServiceEvent.Outcome.SUCCESS, corr, {"vente_id": vente_id})
             return Response(status=204)
 
-        vente = Vente.objects.filter(id=vente_id, est_retournee=False).first()
-        if vente:
-            vente.est_retournee = True
-            vente.save()
-        _cache[idem] = True
-        return Response(status=204)
+        except Exception as e:
+            log_event("DELETE_VENTE", ServiceEvent.Outcome.FAILURE, corr, {"vente_id": vente_id, "error": str(e)})
+            raise
+    
+def log_event(action: str, outcome: str, correlation_id: str = "", detail: dict | None = None):
+    ServiceEvent.objects.create(
+        action=action,
+        outcome=outcome,
+        correlation_id=correlation_id or "",
+        detail=detail or {},
+    )

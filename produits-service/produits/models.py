@@ -2,6 +2,7 @@
 Module des modèles de l'application application_multi_magasins.
 """
 
+import uuid
 from django.db import models
 from django.core.exceptions import ValidationError
 
@@ -144,3 +145,19 @@ class DemandeReappro(models.Model):
         # pylint: disable=no-member
         return (f"{self.quantite} x {self.produit.nom} pour {self.magasin.nom} "
                 f"({self.get_statut_display()})")
+
+class ServiceEvent(models.Model):
+    class Outcome(models.TextChoices):
+        SUCCESS = "SUCCESS", "Succès"
+        FAILURE = "FAILURE", "Échec"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    action = models.CharField(max_length=60)               
+    outcome = models.CharField(max_length=10, choices=Outcome.choices)
+    correlation_id = models.CharField(max_length=100, blank=True)
+    detail = models.JSONField(default=dict, blank=True)    
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [models.Index(fields=["action"]), models.Index(fields=["correlation_id"]), models.Index(fields=["created_at"])]
+        ordering = ["-created_at"]
