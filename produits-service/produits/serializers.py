@@ -66,3 +66,13 @@ class DemandeReapproSerializer(serializers.ModelSerializer):
     class Meta:
         model = DemandeReappro
         fields = '__all__'
+
+## Laboratoire 6 : Sérialiseur pour la saga
+class VenteLineInSerializer(serializers.Serializer):
+    produit_id = serializers.UUIDField()
+    quantite   = serializers.IntegerField(min_value=1)
+    prix_unit  = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+class VenteCreateSerializer(serializers.Serializer):
+    magasin_id = serializers.UUIDField()
+    lignes     = VenteLineInSerializer(many=True)

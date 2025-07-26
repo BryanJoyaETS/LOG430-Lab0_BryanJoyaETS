@@ -6,9 +6,9 @@ from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 from rest_framework import status
 
-from .models import Magasin, Stock, Vente, LigneVente
+from .models import Magasin, Stock, Vente, LigneVente, Cart
 from .serializers import (MagasinSerializer, StockSerializer,
-                           VenteSerializer, LigneVenteSerializer)
+                           VenteSerializer, LigneVenteSerializer, CartSerializer)
 
 # 2) Menu de la caisse pour un magasin donné (HTML + JSON)
 class InterfaceCaisseAPIView(APIView):
@@ -192,3 +192,41 @@ class HistoriqueTransactionsAPIView(APIView):
             return Response(serializer.data)
         # HTML
         return Response({'magasin': magasin, 'ventes': ventes})
+
+
+
+## Laboratoire 6 : vues pour la saga
+
+def _idempotent(request, tag):
+    return request.headers.get("Idempotency-Key", "") + tag
+
+_cache = {}
+
+class LockCartAPIView(APIView):
+    def post(self, request, cart_id):
+        key = _idempotent(request, "lock")
+        if key in _cache:
+            return Response(_cache[key])              
+
+        cart = get_object_or_404(Cart, id=cart_id)
+        if cart.status != "OPEN":
+            return Response({"detail": "Cart déjà verrouillé"},
+                            status=status.HTTP_409_CONFLICT)
+
+        cart.status = "LOCKED"
+        cart.save()
+        data = CartSerializer(cart).data
+        _cache[key] = data
+        return Response(data, status=200)
+
+class UnlockCartAPIView(APIView):
+    def post(self, request, cart_id):
+        key = _idempotent(request, "unlock")
+        if key in _cache:
+            return Response(status=204)
+
+        cart = get_object_or_404(Cart, id=cart_id)
+        cart.status = "OPEN"
+        cart.save()
+        _cache[key] = True
+        return Response(status=204)

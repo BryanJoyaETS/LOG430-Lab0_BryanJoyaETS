@@ -1,7 +1,7 @@
 # pylint: disable=no-member, import-error, too-few-public-methods
 from datetime import timedelta
 import logging
-
+from django.db import transaction
 logger = logging.getLogger(__name__)
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
@@ -11,6 +11,8 @@ from rest_framework.views import APIView
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.core.cache import cache
+from .models import Vente, LigneVente
+from .serializers import VenteCreateSerializer
 
 from produits.models import (
     Produit,
@@ -63,3 +65,41 @@ class ModifierProduitAPIView(APIView):
             context = {'produit': produit, 'errors': serializer.errors}
             return Response(context, template_name=self.template_name, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+_cache = {}
+
+class CreateVenteAPIView(APIView):
+    def post(self, request):
+        idem = request.headers.get("Idempotency-Key")
+        if idem in _cache:
+            return Response(_cache[idem], status=201)
+
+        ser = VenteCreateSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        data = ser.validated_data
+
+        with transaction.atomic():
+            vente = Vente.objects.create(magasin_id=data["magasin_id"])
+            for l in data["lignes"]:
+                LigneVente.objects.create(
+                    vente=vente, produit_id=l["produit_id"],
+                    quantite=l["quantite"], prix_unitaire=l["prix_unit"]
+                )
+
+        resp = {"id": str(vente.id)}
+        _cache[idem] = resp
+        return Response(resp, status=201)
+
+class DeleteVenteAPIView(APIView):
+    def delete(self, request, vente_id):
+        idem = request.headers.get("Idempotency-Key") + "del"
+        if idem in _cache:
+            return Response(status=204)
+
+        vente = Vente.objects.filter(id=vente_id, est_retournee=False).first()
+        if vente:
+            vente.est_retournee = True
+            vente.save()
+        _cache[idem] = True
+        return Response(status=204)

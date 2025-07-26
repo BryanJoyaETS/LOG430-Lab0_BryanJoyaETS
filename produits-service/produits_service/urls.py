@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, re_path
-from produits.views import ListeProduitsAPIView, ModifierProduitAPIView
+from produits.views import ListeProduitsAPIView, ModifierProduitAPIView, CreateVenteAPIView, DeleteVenteAPIView
 from django_prometheus import exports
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -43,5 +43,9 @@ urlpatterns = [
             schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('api/produits/swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('api/produits/redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+
+    ## Laboratoire 6 : URL pour la saga
+    path("api/produits/ventes/", CreateVenteAPIView.as_view()),
+    path("api/produits/ventes/<uuid:vente_id>/", DeleteVenteAPIView.as_view()),
     
 ]

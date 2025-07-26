@@ -2,6 +2,7 @@
 Module des modèles de l'application application_multi_magasins.
 """
 
+import uuid
 from django.db import models
 from django.core.exceptions import ValidationError
 
@@ -144,3 +145,20 @@ class DemandeReappro(models.Model):
         # pylint: disable=no-member
         return (f"{self.quantite} x {self.produit.nom} pour {self.magasin.nom} "
                 f"({self.get_statut_display()})")
+
+## LABORATOIRE 6 : Modeles pour la saga
+class Cart(models.Model):
+    STATUS = (
+        ("OPEN", "Ouvert"),
+        ("LOCKED", "Verrouillé"),
+    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    magasin_id = models.UUIDField()
+    status = models.CharField(max_length=10, choices=STATUS, default="OPEN")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class CartLine(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="lines")
+    produit = models.ForeignKey(Produit, on_delete=models.CASCADE)
+    quantite = models.PositiveIntegerField()
+

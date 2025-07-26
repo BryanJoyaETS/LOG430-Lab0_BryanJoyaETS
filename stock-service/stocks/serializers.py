@@ -6,7 +6,7 @@ permettant la conversion entre les objets Django et les représentations JSON po
 """
 # pylint: disable=too-few-public-methods
 from rest_framework import serializers
-from .models import Magasin, Produit, Vente, LigneVente, Stock, DemandeReappro
+from .models import Magasin, Produit, Vente, LigneVente, Stock, DemandeReappro, Reservation, ReservationLine
 
 class MagasinSerializer(serializers.ModelSerializer):
     """
@@ -66,3 +66,11 @@ class DemandeReapproSerializer(serializers.ModelSerializer):
     class Meta:
         model = DemandeReappro
         fields = '__all__'
+
+class ReservationLineInSerializer(serializers.Serializer):
+    produit_id = serializers.UUIDField()
+    quantite   = serializers.IntegerField(min_value=1)
+
+class ReservationCreateSerializer(serializers.Serializer):
+    magasin_id = serializers.UUIDField()
+    lignes     = ReservationLineInSerializer(many=True)

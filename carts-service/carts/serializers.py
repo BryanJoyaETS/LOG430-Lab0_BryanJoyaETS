@@ -1,6 +1,7 @@
 # carts/serializers.py
 from rest_framework import serializers
-from .models import Magasin, Produit, Stock, Vente, LigneVente
+from .models import Magasin, Produit, Stock, Vente, LigneVente, Cart, CartLine
+
 
 class MagasinSerializer(serializers.ModelSerializer):
     class Meta:
@@ -37,3 +38,15 @@ class DemandeReapproSerializer(serializers.ModelSerializer):
     class Meta:
         model = DemandeReappro
         fields = ['id','magasin','produit','quantite','statut','date_demande','date_traitement']
+
+class CartLineSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CartLine
+        fields = ["produit_id", "quantite"]
+
+class CartSerializer(serializers.ModelSerializer):
+    lines = CartLineSerializer(many=True, read_only=True)
+    class Meta:
+        model = Cart
+        fields = ["id", "magasin_id", "status", "lines"]
+

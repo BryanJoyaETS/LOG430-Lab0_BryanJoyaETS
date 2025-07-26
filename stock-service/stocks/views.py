@@ -10,6 +10,10 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
+from .serializers import ReservationCreateSerializer
+from .models import Reservation, ReservationLine, Stock
+from django.db import transaction
+
 
 logger = logging.getLogger(__name__)
 
@@ -141,3 +145,57 @@ class DemandeReapproActionAPIView(APIView):
             json={'action': action}
         )
         return Response(resp.json(), status=resp.status_code)
+    
+
+_cache = {}
+
+class CreateReservationAPIView(APIView):
+    def post(self, request):
+        idem = request.headers.get("Idempotency-Key")
+        if idem in _cache:
+            return Response(_cache[idem], status=201)
+
+        ser = ReservationCreateSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        data = ser.validated_data
+
+        with transaction.atomic():
+            reserv = Reservation.objects.create(magasin_id=data["magasin_id"])
+            for ligne in data["lignes"]:
+                stock = Stock.objects.select_for_update().get(
+                    magasin_id=data["magasin_id"],
+                    produit_id=ligne["produit_id"]
+                )
+                if stock.quantite < ligne["quantite"]:
+                    raise ValueError("Stock insuffisant")
+                stock.quantite -= ligne["quantite"]
+                stock.save()
+                ReservationLine.objects.create(
+                    reservation=reserv, produit_id=ligne["produit_id"],
+                    quantite=ligne["quantite"]
+                )
+
+        resp = {"id": str(reserv.id)}
+        _cache[idem] = resp
+        return Response(resp, status=201)
+
+class DeleteReservationAPIView(APIView):
+    def delete(self, request, reservation_id):
+        idem = request.headers.get("Idempotency-Key") + "del"
+        if idem in _cache:
+            return Response(status=204)
+
+        with transaction.atomic():
+            reserv = Reservation.objects.select_for_update().get(id=reservation_id)
+            if reserv.status == "RELEASED":
+                return Response(status=204)
+            for line in reserv.lines.all():
+                stock = Stock.objects.select_for_update().get(
+                    magasin=reserv.magasin, produit=line.produit
+                )
+                stock.quantite += line.quantite
+                stock.save()
+            reserv.status = "RELEASED"
+            reserv.save()
+        _cache[idem] = True
+        return Response(status=204)

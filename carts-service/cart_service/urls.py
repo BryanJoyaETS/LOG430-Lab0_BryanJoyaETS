@@ -2,10 +2,12 @@ from django.contrib import admin
 from django.urls import path, re_path
 from carts.views import (
     InterfaceCaisseAPIView,
+    LockCartAPIView,
     RechercheProduitAPIView,
     EnregistrerVenteAPIView,
     TraiterRetourAPIView,
     HistoriqueTransactionsAPIView,
+    UnlockCartAPIView,
 )
 from django_prometheus import exports
 from drf_yasg.views import get_schema_view
@@ -60,4 +62,8 @@ urlpatterns = [
             schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('api/caisse/swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('api/caisse/redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+
+    ##Laboratoire 6 : URL pour la saga
+    path("api/caisse/<uuid:cart_id>/lock/",   LockCartAPIView.as_view()),
+    path("api/caisse/<uuid:cart_id>/unlock/", UnlockCartAPIView.as_view()),
 ]

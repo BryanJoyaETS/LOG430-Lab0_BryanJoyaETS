@@ -22,7 +22,7 @@ from django.urls import path, re_path
 from django_prometheus import exports
 from stocks.views import (
     StockMagasinAPIView, ReapproAPIView, TraitementDemandeReapproAPIView,
-    DemandeReapproActionAPIView, DemandeReapproAPIView
+    DemandeReapproActionAPIView, DemandeReapproAPIView, CreateReservationAPIView, DeleteReservationAPIView
 )
 
 schema_view = get_schema_view(
@@ -55,5 +55,9 @@ urlpatterns = [
     path('api/stock/redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$',
         schema_view.without_ui(cache_timeout=0), name='schema-json'),
+
+    ## Laboratoire 6 : API pour la saga
+    path("api/stock/reservations/", CreateReservationAPIView.as_view()),
+    path("api/stock/reservations/<uuid:reservation_id>/", DeleteReservationAPIView.as_view()),
 
 ]
