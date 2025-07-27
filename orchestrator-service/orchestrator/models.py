@@ -1,5 +1,7 @@
+# orchestrator/models.py
 import uuid
 from django.db import models
+from django.db.models import Q  # NEW
 
 class SagaState(models.TextChoices):
     NEW            = "NEW", "Nouvelle"
@@ -14,10 +16,22 @@ class Saga(models.Model):
     cart_id = models.UUIDField()
     state = models.CharField(max_length=20, choices=SagaState.choices, default=SagaState.NEW)
     reservation_id = models.UUIDField(null=True, blank=True)
-    payment_id = models.UUIDField(null=True, blank=True) 
-    vente_id = models.IntegerField(null=True, blank=True) 
+    payment_id = models.UUIDField(null=True, blank=True)
+    vente_id = models.IntegerField(null=True, blank=True)
     last_error = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    client_key = models.CharField(max_length=100, blank=True, db_index=True)
+    response_payload = models.JSONField(default=dict, blank=True)
+
+    class Meta:
+        ordering = ["created_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["client_key"],
+                condition=~Q(client_key=""),
+                name="uniq_client_key_not_empty",
+            ),
+        ]
 
     def record(self, etype: str, payload: dict | None = None):
         return SagaEvent.objects.create(saga=self, type=etype, payload=payload or {})
