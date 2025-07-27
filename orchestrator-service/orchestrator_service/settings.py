@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from pythonjsonlogger import jsonlogger
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,7 +41,30 @@ ALLOWED_HOSTS = [
     "lab3-web-3",
     "lab3-web-4",
     "lb",
+    "orchestrator",
 ]
+
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "json": {
+            "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
+            "fmt": "%(asctime)s %(levelname)s %(name)s %(message)s "
+                   "%(saga_id)s %(event)s %(state)s %(cart_id)s %(reservation_id)s %(vente_id)s %(correlation_id)s",
+        },
+    },
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "formatter": "json"},
+    },
+    "loggers": {
+        "django": {"handlers": ["console"], "level": LOG_LEVEL, "propagate": False},
+        "saga":   {"handlers": ["console"], "level": LOG_LEVEL, "propagate": False},
+    },
+    "root": {"handlers": ["console"], "level": LOG_LEVEL},
+}
 
 
 # Application definition
@@ -53,6 +78,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'orchestrator',
+    'django_prometheus',
 ]
 
 MIDDLEWARE = [

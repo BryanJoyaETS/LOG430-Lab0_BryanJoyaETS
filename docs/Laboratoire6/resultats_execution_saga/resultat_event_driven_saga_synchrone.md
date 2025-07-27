@@ -12,7 +12,7 @@ Ce document explique, **capture par capture**, comment ta saga orchestrée synch
 
 ---
 
-## 2) Seed côté *stocks*
+## 2) Peupler *stocks*
 ![Stocks seed](<Capture d’écran 2025-07-26 161808.png>)
 
 **Contexte :** initialisation **stocks**.  
@@ -21,7 +21,7 @@ Ce document explique, **capture par capture**, comment ta saga orchestrée synch
 
 ---
 
-## 3) Seed côté *produits* + création du panier
+## 3) Peupler *produits* + création du panier
 ![Produits + panier](<Capture d’écran 2025-07-26 161821.png>)
 
 **Contexte :** synchronization **produits** + **carts**.  
@@ -30,7 +30,7 @@ Ce document explique, **capture par capture**, comment ta saga orchestrée synch
 
 ---
 
-## 4) Appel de la saga (happy‑path) + événements orchestrateur
+## 4) Appel de la saga + événements orchestrateur
 ![POST orchestrator + events](<Capture d’écran 2025-07-26 161849.png>)
 
 **Contexte :** **POST `/api/orchestrator/`** avec `Idempotency-Key: hp-1`.  
@@ -44,7 +44,7 @@ Ce document explique, **capture par capture**, comment ta saga orchestrée synch
 
 **Contexte :** vérifications.  
 **Ce que ça montre :** *stocks* : **15 − 3 = 12** ; *produits* : **Vente#1** avec la ligne `{produit_id:501, quantite:3, prix_unitaire:0.00}`.  
-**Ce que ça prouve :** effets persistés et cohérents. (*Amélioration : propager `prix_unit` réel depuis carts*.)
+**Ce que ça prouve :** effets persistés et cohérents. 
 
 ---
 
@@ -128,5 +128,3 @@ Ce document explique, **capture par capture**, comment ta saga orchestrée synch
 - **Idempotence** : pas de doublons.  
 - **Rollback/compensation** : UNLOCK panier, pas d’état incohérent.  
 - **Traçabilité** : `ServiceEvent` (carts/stocks/produits) + `SagaEvent` (orchestrateur).
-
-> Vers un **event‑driven asynchrone** complet : publier ces événements sur un **bus** (Kafka/RabbitMQ/Redis Streams) et faire réagir les services comme **consumers**.

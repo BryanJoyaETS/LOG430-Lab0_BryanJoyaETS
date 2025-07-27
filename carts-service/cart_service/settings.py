@@ -39,6 +39,7 @@ ALLOWED_HOSTS = [
     "lab3-web-3",
     "lab3-web-4",
     "lb",
+    "orchestrator",
 ]
 
 

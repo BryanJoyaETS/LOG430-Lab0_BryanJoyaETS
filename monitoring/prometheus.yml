@@ -12,3 +12,4 @@ scrape_configs:
         - "accounts:8000"
         - "rapports:8000"
         - "web:8000"
+        - "orchestrator:8000"
