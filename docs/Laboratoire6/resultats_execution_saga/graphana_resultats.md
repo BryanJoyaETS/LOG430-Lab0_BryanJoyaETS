@@ -1,3 +1,4 @@
+```bash
 log430@log430-etudiante-36:~/LOG430-Lab0_BryanJoyaETS$ # Variables
 export MAG=101
 export PROD=501
@@ -56,7 +57,7 @@ log430@log430-etudiante-36:~/LOG430-Lab0_BryanJoyaETS$ curl -sS -X POST "http://
 echo
 {"error":"500 Server Error: Internal Server Error for url: http://stocks:8000/api/stock/reservations/"}
 log430@log430-etudiante-36:~/LOG430-Lab0_BryanJoyaETS$ 
-
+```
 ![alt text](<Capture d’écran 2025-07-26 233547.png>)
 ![alt text](<Capture d’écran 2025-07-26 232845.png>) 
 ![alt text](<Capture d’écran 2025-07-26 233147.png>)
