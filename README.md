@@ -90,7 +90,7 @@ ADRs :
 ---
 
 
-## Analyse des tests et Graphana
+## Analyse des tests
 
 ```bash
 

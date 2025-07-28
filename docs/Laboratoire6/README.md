@@ -288,3 +288,5 @@ docker compose exec -T stocks python manage.py shell -c \
 docker compose exec -T produits python manage.py shell -c \
 "from produits.models import ServiceEvent; print(list(ServiceEvent.objects.order_by('-created_at')[:10].values('action','outcome','correlation_id','detail')))"
 ```
+
+![alt text](<Capture d’écran 2025-07-26 233547.png>) ![alt text](<Capture d’écran 2025-07-26 232845.png>) ![alt text](<Capture d’écran 2025-07-26 233147.png>)
